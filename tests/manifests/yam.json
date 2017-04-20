@@ -1,0 +1,9 @@
+{
+  "status": "built",
+  "errors": null,
+  "files": {
+    "app": [
+      "rel/path/to/some_file.js"
+    ]
+  }
+}

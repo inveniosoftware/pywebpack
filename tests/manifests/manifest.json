@@ -1,0 +1,4 @@
+{
+  "app": "mods/alpha.1234567890.js",
+  "mods/omega.js": "mods/omega.0987654321.js"
+}

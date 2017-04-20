@@ -1,0 +1,6 @@
+{
+  "status": "error",
+  "file": "/path/to/file/that/caused/the/error",
+  "error": "ErrorName",
+  "message": "ErrorMessage"
+}
