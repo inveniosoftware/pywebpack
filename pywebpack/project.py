@@ -70,7 +70,7 @@ class WebpackProject(object):
 
     def run(self, script_name, *args):
         """Run an NPM script."""
-        scripts = self.npmpkg.package_json.get('scripts').keys()
+        scripts = self.npmpkg.package_json.get('scripts', {}).keys()
         if script_name not in scripts:
             raise RuntimeError('Invalid NPM script.')
         return self.npmpkg.run_script(script_name, *args)
