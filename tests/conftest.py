@@ -76,7 +76,7 @@ def bundledir(sourcedir):
 
 @pytest.yield_fixture()
 def destdir(tmpdir):
-    """Example output directory."""
+    """Get example output directory."""
     dst = join(tmpdir, 'simple')
     makedirs(dst)
     yield dst
