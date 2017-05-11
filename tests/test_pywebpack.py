@@ -102,7 +102,7 @@ def test_templateproject_create_config(templatedir, destdir):
     assert json_from_file(project.config_path) == expected_config
 
 
-def test_tempateproject_buildall(templatedir, destdir):
+def test_templateproject_buildall(templatedir, destdir):
     """Test build all."""
     project = WebpackTemplateProject(
         destdir,
