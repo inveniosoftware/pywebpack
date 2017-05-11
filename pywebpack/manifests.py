@@ -83,6 +83,10 @@ class Manifest(object):
         except KeyError:
             raise AttributeError('Attribute {} does not exists.'.format(name))
 
+    def __iter__(self):
+        """Iterate over entries in the manifest."""
+        return iter(self._entries.viewvalues())
+
 
 class ManifestEntry(object):
     """Represents a manifest entry."""
@@ -107,6 +111,11 @@ class ManifestEntry(object):
                 raise UnsupportedExtensionError(p)
             out.append(tpl.format(p))
         return ''.join(out)
+
+    def __iter__(self):
+        """Iterate over files in the manifest entry."""
+        for path in self._paths:
+            yield path
 
     def __str__(self):
         """Render entry."""
