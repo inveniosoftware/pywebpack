@@ -61,7 +61,7 @@ class WebpackProject(object):
     @property
     @cached
     def npmpkg(self):
-        """API to NPM package."""
+        """Get API to NPM package."""
         return NPMPackage(self.path)
 
     def install(self, *args):
@@ -104,7 +104,7 @@ class WebpackTemplateProject(WebpackProject):
 
     @property
     def config(self):
-        """Configuration dictionary."""
+        """Get configuration dictionary."""
         if self._config is None:
             return None
         config = self._config() if callable(self._config) else self._config
