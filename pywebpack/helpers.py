@@ -34,5 +34,11 @@ def cached(f):
 
 def merge_deps(deps, bundles_deps):
     """Merge NPM dependencies."""
-    deps.update(bundles_deps)
+    keys = ['dependencies', 'devDependencies', 'peerDependencies']
+    for k in keys:
+        if k not in deps:
+            deps[k] = {}
+
+        if k in bundles_deps:
+            deps[k].update(bundles_deps[k])
     return deps
