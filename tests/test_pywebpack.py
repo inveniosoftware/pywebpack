@@ -149,8 +149,11 @@ def test_bundleproject(builddir, bundledir, destdir):
 
     # Assert generated package.json
     package_json = json_from_file(project.npmpkg.package_json_path)
-    for k in ['dependencies', 'devDependencies', 'peerDependencies']:
-        assert package_json[k] == project.dependencies[k]
+    # Coming from bundle
+    assert package_json['dependencies'] == {'lodash': '~4'}
+    # Coming from source package.json
+    assert package_json['devDependencies'] == {'lodash': '~4'}
+    assert package_json['peerDependencies'] == {}
 
     # Build project and see that it works.
     project.install()

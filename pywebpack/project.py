@@ -103,9 +103,10 @@ class WebpackTemplateProject(WebpackProject):
         """Storage class property."""
         return self._storage_cls
 
-    def create(self):
+    def create(self, force=None):
         """Create webpack project from a template."""
-        self.storage_cls(self._project_template, self.project_path).run()
+        self.storage_cls(self._project_template, self.project_path).run(
+            force=force)
 
         # Write config if not empty
         config = self.config
@@ -185,16 +186,17 @@ class WebpackBundleProject(WebpackTemplateProject):
         """Merge bundle dependencies into ``package.json``."""
         return merge_deps(self.npmpkg.package_json, self.dependencies)
 
-    def collect(self):
+    def collect(self, force=None):
         """Collect asset files from bundles."""
         for b in self.bundles:
-            self.storage_cls(b.path, self.project_path).run()
+            self.storage_cls(b.path, self.project_path).run(force=force)
 
-    def create(self):
+    def create(self, force={'package.json'}):
         """Create webpack project from a template."""
-        super(WebpackBundleProject, self).create()
+        # Force package.json to be overwritten always.
+        super(WebpackBundleProject, self).create(force=force)
         # Collect all asset files from the bundles.
-        self.collect()
+        self.collect(force=force)
         # Generate new package json (reads the package.json and merges in
         # npm dependencies; must be done before opening the file for writing)
         package_json = self.package_json

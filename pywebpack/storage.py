@@ -36,16 +36,17 @@ class FileStorage(object):
         """Iterate files from a directory."""
         return iter_files(self.srcdir)
 
-    def _copyfile(self, src, dst):
+    def _copyfile(self, src, dst, force=False):
         """Copy file from source to destination."""
         if exists(dst):
-            if getmtime(dst) >= getmtime(src):
+            if getmtime(dst) >= getmtime(src) and not force:
                 return
             remove(dst)
         copy(src, dst)
 
-    def run(self):
+    def run(self, force=None):
         """Copy files from source to destination."""
+        force = force or {}
         for fsrc, relpath in self:
             fdst = join(self.dstdir, relpath)
             fdstdir = dirname(fdst)
@@ -53,16 +54,17 @@ class FileStorage(object):
             if not exists(fdstdir):
                 makedirs(fdstdir)
 
-            self._copyfile(fsrc, fdst)
+            self._copyfile(fsrc, fdst, force=relpath in force)
 
 
 class LinkStorage(FileStorage):
     """Storage class that link files."""
 
-    def _copyfile(self, src, dst):
+    def _copyfile(self, src, dst, force=False):
         """Symlink file from source to destination."""
         if exists(dst):
-            if not islink(dst) or realpath(src) == realpath(dst):
+            if (not islink(dst) or realpath(src) == realpath(dst)) \
+                    and not force:
                 return
             remove(dst)
         symlink(src, dst)
