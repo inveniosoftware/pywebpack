@@ -70,7 +70,7 @@ class Manifest(object):
 
     def __iter__(self):
         """Iterate over entries in the manifest."""
-        return iter(self._entries.viewvalues())
+        return iter(self._entries.values())
 
 
 class ManifestEntry(object):

@@ -21,12 +21,13 @@ from pywebpack.storage import FileStorage, LinkStorage, iter_files
 def test_iterfiles(sourcedir):
     """Test file iteration."""
     assert sorted([x[1] for x in iter_files(sourcedir)]) == [
+        'broken/package.json',
         'buildtpl/package.json',
         'buildtpl/webpack.config.js',
         'bundle/index.js',
         'simple/index.js',
         'simple/package.json',
-        'simple/webpack.config.js',
+        'simple/webpack.config.js'
     ]
 
 

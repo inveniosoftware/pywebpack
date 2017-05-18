@@ -14,6 +14,8 @@ from __future__ import absolute_import, print_function
 import json
 from os.path import exists, join
 
+import pytest
+
 from pywebpack import WebpackBundle, WebpackBundleProject, WebpackProject, \
     WebpackTemplateProject
 
@@ -53,6 +55,12 @@ def test_project_buildall(simpleprj):
     project.buildall()
     assert exists(join(project.project_path, 'node_modules'))
     assert exists(join(project.project_path, 'dist/bundle.js'))
+
+
+def test_project_no_scripts(brokenprj):
+    project = WebpackProject(brokenprj)
+    with pytest.raises(RuntimeError):
+        project.buildall()
 
 
 def test_templateproject_create(templatedir, destdir):
