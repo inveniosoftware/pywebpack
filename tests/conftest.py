@@ -11,13 +11,11 @@
 
 from __future__ import absolute_import, print_function
 
-import json
 import shutil
 import tempfile
 from os import makedirs
 from os.path import dirname, exists, join
 
-import pkg_resources
 import pytest
 
 
@@ -74,6 +72,14 @@ def simpleprj(templatedir, tmpdir):
     """Initialize simple webpack project."""
     dst = join(tmpdir, 'simple')
     shutil.copytree(templatedir, dst)
+    return join(dst, 'package.json')
+
+
+@pytest.fixture()
+def brokenprj(sourcedir, tmpdir):
+    """Initialize broken webpack project."""
+    dst = join(tmpdir, 'broken')
+    shutil.copytree(join(sourcedir, 'broken'), dst)
     return join(dst, 'package.json')
 
 

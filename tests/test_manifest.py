@@ -11,27 +11,29 @@
 
 from __future__ import absolute_import, print_function
 
-import json
-from os.path import exists, join
-
 import pytest
 
 from pywebpack import InvalidManifestError, Manifest, ManifestEntry, \
-    ManifestError, ManifestLoader, UnfinishedManifestError, \
-    UnsupportedExtensionError, WebpackBundleTrackerFactory, \
-    WebpackManifestFactory, WebpackYamFactory
+    ManifestLoader, UnfinishedManifestError, UnsupportedExtensionError, \
+    WebpackBundleTrackerFactory, WebpackManifestFactory, WebpackYamFactory
 
 
-def test_render():
-    """Test rendering."""
+@pytest.fixture()
+def exmanif():
     m = Manifest()
     m.add(ManifestEntry('script', ['/a.js', '/b.js']))
     m.add(ManifestEntry('styles', ['/a.css', '/b.css']))
+    return m
 
-    assert m.script.render() == m['script'].render() == str(m.script) == \
+
+def test_render(exmanif):
+    """Test rendering."""
+
+    assert exmanif.script.render() == exmanif['script'].render() == \
+        str(exmanif.script) == \
         '<script src="/a.js"></script>' \
         '<script src="/b.js"></script>'
-    assert m.styles.render() == m['styles'].render() == \
+    assert exmanif.styles.render() == exmanif['styles'].render() == \
         '<link rel="stylesheet" href="/a.css"></link>' \
         '<link rel="stylesheet" href="/b.css"></link>'
 
@@ -83,3 +85,11 @@ def test_factory_invalid(bundletracker_invalid_path, yam_invalid_path):
         WebpackYamFactory().load,
         yam_invalid_path
     )
+
+
+def test_iter_manifest(exmanif):
+    assert {m.name for m in exmanif} == {'script', 'styles'}
+
+
+def test_iter_manifest_entry(exmanif):
+    assert {p for p in exmanif.script} == {'/a.js', '/b.js'}
