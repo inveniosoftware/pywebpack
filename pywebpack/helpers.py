@@ -14,6 +14,7 @@ from __future__ import absolute_import, print_function
 from functools import wraps
 
 import pkg_resources
+from semver import max_satisfying
 
 
 def bundles_from_entry_point(group):
@@ -36,9 +37,15 @@ def merge_deps(deps, bundles_deps):
     """Merge NPM dependencies."""
     keys = ['dependencies', 'devDependencies', 'peerDependencies']
     for k in keys:
-        if k not in deps:
-            deps[k] = {}
-
+        deps.setdefault(k, {})
         if k in bundles_deps:
-            deps[k].update(bundles_deps[k])
+            target_deps = deps[k]
+            source_deps = bundles_deps[k]
+            for pkg, version in source_deps.items():
+                if pkg in target_deps:
+                    satisfying = max_satisfying([target_deps[pkg], version],
+                                                '*', True)
+                    target_deps[pkg] = satisfying
+                else:
+                    target_deps[pkg] = version
     return deps

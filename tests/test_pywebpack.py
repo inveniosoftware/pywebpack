@@ -18,6 +18,7 @@ import pytest
 
 from pywebpack import WebpackBundle, WebpackBundleProject, WebpackProject, \
     WebpackTemplateProject
+from pywebpack.helpers import merge_deps
 
 
 def json_from_file(filepath):
@@ -30,6 +31,29 @@ def test_version():
     """Test version import."""
     from pywebpack import __version__
     assert __version__
+
+
+@pytest.mark.parametrize("target,source,expected", [
+    ({},
+     {},
+     {'dependencies': {}, 'devDependencies': {}, 'peerDependencies': {}}),
+
+    ({},
+     {'dependencies': {'mypkg': '1.0'}},
+     {'dependencies': {'mypkg': '1.0'}, 'devDependencies': {},
+      'peerDependencies': {}}),
+
+    ({'dependencies': {'mypkg': '1.0'}},
+     {'dependencies': {'mypkg': '2.0'}},
+     {'dependencies': {'mypkg': '2.0'}, 'devDependencies': {},
+      'peerDependencies': {}}),
+
+    ({'dependencies': {'mypkg': '2.0'}}, {'dependencies': {'mypkg': '1.0'}},
+     {'dependencies': {'mypkg': '2.0'}, 'devDependencies': {},
+      'peerDependencies': {}})
+])
+def test_merge_deps(target, source, expected):
+    assert merge_deps(target, source) == expected
 
 
 def test_project(simpleprj):

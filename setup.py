@@ -24,7 +24,7 @@ tests_require = [
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
-    'pytest>=2.8.0',
+    'pytest>=2.8.0'
 ]
 
 extras_require = {
@@ -44,6 +44,7 @@ setup_requires = [
 
 install_requires = [
     'pynpm>=0.1.0',
+    'node-semver>=0.1.1'
 ]
 
 packages = find_packages()
