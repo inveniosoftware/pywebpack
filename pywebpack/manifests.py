@@ -78,7 +78,7 @@ class ManifestEntry(object):
 
     templates = {
         '.js': '<script src="{}"></script>',
-        '.css': '<link rel="stylesheet" href="{}"></link>',
+        '.css': '<link rel="stylesheet" href="{}" />',
     }
 
     def __init__(self, name, paths):

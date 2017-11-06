@@ -34,8 +34,8 @@ def test_render(exmanif):
         '<script src="/a.js"></script>' \
         '<script src="/b.js"></script>'
     assert exmanif.styles.render() == exmanif['styles'].render() == \
-        '<link rel="stylesheet" href="/a.css"></link>' \
-        '<link rel="stylesheet" href="/b.css"></link>'
+        '<link rel="stylesheet" href="/a.css" />' \
+        '<link rel="stylesheet" href="/b.css" />'
 
 
 def test_manifest_add_same_name():
