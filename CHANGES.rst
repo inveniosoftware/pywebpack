@@ -1,6 +1,10 @@
 Changes
 =======
 
+Version 0.1.2 (released 2017-11-06)
+
+- Fix invalid closing of </link> tag.
+
 Version 0.1.1 (released 2017-05-29)
 
 - Fix problem with package.json not being updated.

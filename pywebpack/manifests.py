@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of PyWebpack
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2017 CERN
+# Copyright (C) 2017 Anders Kaseorg
 #
 # PyWebpack is free software; you can redistribute it and/or modify
 # it under the terms of the Revised BSD License; see LICENSE file for
