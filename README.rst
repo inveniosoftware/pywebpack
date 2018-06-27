@@ -41,9 +41,9 @@ Optionally you can use PyWebpack to also:
 
 * **Inject configuration:** PyWebpack will write a ``config.json`` into
   your webpack project, which you can import in your webpack configuration. You
-  define what goes in the config, but you can use to let e.g. Webpack know
-  about output paths or dynamic entry points.
+  can define what goes in the config e.g. Let webpack knows about output paths or
+  dynamic entry points.
 * **Collect bundles:** If you Webpack project is spread over multiple Python
   packages, PyWebpack can help you dynamically assemble the files into a
-  Webpack project. This is useful if you don't know until runtime which
+  Webpack project. This is useful if you don't know until build time which
   packages are installed.
