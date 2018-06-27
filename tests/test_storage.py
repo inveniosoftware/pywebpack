@@ -25,6 +25,7 @@ def test_iterfiles(sourcedir):
         'buildtpl/package.json',
         'buildtpl/webpack.config.js',
         'bundle/index.js',
+        'bundle2/main.js',
         'simple/index.js',
         'simple/package.json',
         'simple/webpack.config.js'

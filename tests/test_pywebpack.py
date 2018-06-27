@@ -89,7 +89,7 @@ def test_project_no_scripts(brokenprj):
 
 def test_templateproject_create(templatedir, destdir):
     """Test template project creation."""
-    project = WebpackTemplateProject(destdir, project_template=templatedir)
+    project = WebpackTemplateProject(destdir, project_template_dir=templatedir)
     assert not exists(project.npmpkg.package_json_path)
     project.create()
     assert exists(project.npmpkg.package_json_path)
@@ -97,7 +97,7 @@ def test_templateproject_create(templatedir, destdir):
 
 def test_templateproject_clean(templatedir, destdir):
     """Test template project creation."""
-    project = WebpackTemplateProject(destdir, project_template=templatedir)
+    project = WebpackTemplateProject(destdir, project_template_dir=templatedir)
     project.create()
     assert exists(project.project_path)
     project.clean()
@@ -109,8 +109,8 @@ def test_templateproject_create_config(templatedir, destdir):
     expected_config = {'entry': './index.js'}
 
     project = WebpackTemplateProject(
-        destdir,
-        project_template=templatedir,
+        working_dir=destdir,
+        project_template_dir=templatedir,
         config=lambda: expected_config,
     )
 
@@ -122,10 +122,10 @@ def test_templateproject_create_config(templatedir, destdir):
 def test_templateproject_buildall(templatedir, destdir):
     """Test build all."""
     project = WebpackTemplateProject(
-        destdir,
+        working_dir=destdir,
+        project_template_dir=templatedir,
         config={'test': True},
         config_path='build/config.json',
-        project_template=templatedir
     )
     project.buildall()
     assert exists(project.config_path)
@@ -144,8 +144,8 @@ def test_bundleproject(builddir, bundledir, destdir):
         }
     )
     project = WebpackBundleProject(
-        destdir,
-        project_template=builddir,
+        working_dir=destdir,
+        project_template_dir=builddir,
         bundles=(x for x in [bundle]),  # Test for iterator evaluation
         config={'test': True, 'entry': False},
     )
@@ -192,3 +192,31 @@ def test_bundleproject(builddir, bundledir, destdir):
     project.build()
     for p in distpaths:
         assert exists(join(project.project_path, p))
+
+
+@pytest.mark.xfail(raises=RuntimeError)
+def test_bundle_duplicated_entries(builddir, bundledir, bundledir2, destdir):
+    """Test bundles with duplicated entries."""
+    entry = {'app': './index.js'}
+    bundle1 = WebpackBundle(
+        bundledir,
+        entry={'app': './index.js'},
+        dependencies={
+            'lodash': '~4',
+        }
+    )
+    bundle2 = WebpackBundle(
+        bundledir2,
+        entry={'app': './main.js'},
+        dependencies={
+            'lodash': '~3',
+        }
+    )
+    project = WebpackBundleProject(
+        working_dir=destdir,
+        project_template_dir=builddir,
+        bundles=(x for x in [bundle1, bundle2]),
+        config={'test': True, 'entry': False},
+    )
+
+    project.create()

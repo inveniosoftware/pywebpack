@@ -12,6 +12,7 @@
 from __future__ import absolute_import, print_function
 
 import shutil
+import subprocess
 import tempfile
 from os import makedirs
 from os.path import dirname, exists, join
@@ -53,8 +54,14 @@ def builddir(sourcedir):
 
 @pytest.fixture()
 def bundledir(sourcedir):
-    """Get build dir for projects."""
+    """Get build dir for bundle."""
     return join(sourcedir, 'bundle')
+
+
+@pytest.fixture()
+def bundledir2(sourcedir):
+    """Get build dir for bundle."""
+    return join(sourcedir, 'bundle2')
 
 
 @pytest.yield_fixture()
@@ -111,3 +118,25 @@ def yam_invalid_path(manifestsdir):
 def manifest_path(manifestsdir):
     """webpack-manifest-plugin manifest."""
     return join(manifestsdir, 'manifest.json')
+
+
+@pytest.fixture(autouse=True, scope="session")
+def check_webpack_installation():
+    """Check if Webpack is installed locally or globally."""
+    command = 'npm list {where} {pkg}'
+
+    # webpack and webpack-cli must be installed both globally or locally
+    same_scope = dict(globally=[], locally=[])
+    for where, scope in [('-g', 'globally'), ('', 'locally')]:
+        for pkg in ['webpack', 'webpack-cli']:
+            # check local installation
+            cmd = command.format(where=where, pkg=pkg)
+            try:
+                subprocess.check_call(cmd.split(' '))
+            except subprocess.CalledProcessError as exc:
+                same_scope[scope].append(1)
+            else:
+                same_scope[scope].append(0)
+
+    if sum(same_scope['globally']) != 0 and sum(same_scope['locally']) != 0:
+        raise RuntimeError("webpack and webpack-cli must be installed.")

@@ -16,7 +16,6 @@ import shutil
 from os import makedirs
 from os.path import dirname, exists, join
 
-import pkg_resources
 from pynpm import NPMPackage, YarnPackage
 
 from .helpers import cached, merge_deps
@@ -71,19 +70,19 @@ class WebpackProject(object):
 class WebpackTemplateProject(WebpackProject):
     """API for creating and building a webpack project based on a template.
 
-    Copies all files from a project template folder into a destionation path
-    and optionally writes a user provided config in JSON into the destionation
+    Copies all files from a project template folder into a destination path
+    and optionally writes a user provided config in JSON into the destination
     path as well.
     """
 
-    def __init__(self, dest, project_template=None, config=None,
+    def __init__(self, working_dir, project_template_dir, config=None,
                  config_path=None, storage_cls=None):
         """Initialize templated folder."""
-        self._project_template = project_template
+        self._project_template_dir = project_template_dir
         self._storage_cls = storage_cls or FileStorage
         self._config = config
         self._config_path = config_path or 'config.json'
-        super(WebpackTemplateProject, self).__init__(dest)
+        super(WebpackTemplateProject, self).__init__(working_dir)
 
     @property
     def config(self):
@@ -105,7 +104,7 @@ class WebpackTemplateProject(WebpackProject):
 
     def create(self, force=None):
         """Create webpack project from a template."""
-        self.storage_cls(self._project_template, self.project_path).run(
+        self.storage_cls(self._project_template_dir, self.project_path).run(
             force=force)
 
         # Write config if not empty
@@ -133,13 +132,13 @@ class WebpackTemplateProject(WebpackProject):
 class WebpackBundleProject(WebpackTemplateProject):
     """Build webpack project from multiple bundles."""
 
-    def __init__(self, dest, project_template=None, bundles=None, config=None,
-                 config_path=None, storage_cls=None):
+    def __init__(self, working_dir, project_template_dir, bundles=None,
+                 config=None, config_path=None, storage_cls=None):
         """Initialize templated folder."""
         self._bundles_iter = bundles or []
         super(WebpackBundleProject, self).__init__(
-            dest,
-            project_template=project_template,
+            working_dir,
+            project_template_dir=project_template_dir,
             config=config or {},
             config_path=config_path,
             storage_cls=storage_cls,
@@ -155,10 +154,22 @@ class WebpackBundleProject(WebpackTemplateProject):
     @cached
     def entry(self):
         """Get webpack entry points."""
-        res = {}
-        for b in self.bundles:
-            res.update(b.entry)
-        return res
+        entries = dict(entries=dict(), paths=dict())
+        error = 'Duplicated bundle entry for `{0}:{1}` in bundle `{2}` and ' \
+            '`{3}:{4}` in bundle `{5}`. Please choose another entry name.'
+
+        for bundle in self.bundles:
+            for name, filepath in bundle.entry.items():
+                # check that there are no duplicated entries
+                if name in entries['entries']:
+                    prev_filepath, prev_bundle_path = entries['paths'][name]
+                    raise RuntimeError(error.format(name, prev_filepath,
+                                                    prev_bundle_path, name,
+                                                    filepath, bundle.path))
+                entries['paths'][name] = (filepath, bundle.path)
+
+            entries['entries'].update(bundle.entry)
+        return entries['entries']
 
     @property
     def config(self):
