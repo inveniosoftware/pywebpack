@@ -51,7 +51,7 @@ webpack::
 We can easily wrap our project in a :class:`~pywebpack.project.WebpackProject`
 object::
 
-    from pywebpack.project import WebpackProject
+    from pywebpack import WebpackProject
     project_path = '.'
     project = WebpackProject(project_path)
 
@@ -73,12 +73,13 @@ Build time config
 If we need to inject extra configuration at build time we can define a
 :class:`~pywebpack.project.WebpackTemplateProject`::
 
-    from pywebpack.bundle import WebpackTemplateProject
+    from pywebpack import WebpackTemplateProject
     project = WebpackTemplateProject(
         working_dir='tmp',  # where config and assets files will be copied
         project_template_dir='buildconfig',  # `webpack.config.js` location
         config={'debug': True},
-        config_path='build/config.json',
+        config_path='build/config.json',  # location in `working_dir` where
+                                          # `config.json` will be written
     )
 
 ``debug: True`` is an example of configuration that can be injected from Python
@@ -87,12 +88,16 @@ and expose it to Webpack via the generated ``config.json``.
 Assets for multiple modules
 ---------------------------
 
-It is a common practice to split your assets in several files to decrease
-assets file sizes and speed up webpage loading. Pywebpack lets you define a
-project that can have bundles, which are definitions of assets and npm
-dependencies.
+When you have more complex Python projects with multiple modules, each module
+could declare and use different assets. With Pywebpack, we can define a
+:class:`~pywebpack.bundle.WebpackBundle`:: for each module and list the needed
+assets and npm dependencies.
 
-The recommended folder structure for a project with modules is the following::
+We can then declare a :class:`~pywebpack.project.WebpackBundleProject` that
+will collect all bundles and build assets as you configure it.
+
+Let's try with a real example. The recommended folder structure for a project
+with modules is the following::
 
     /buildconfig
         /package.json
@@ -110,15 +115,15 @@ The recommended folder structure for a project with modules is the following::
                 /css
     main.py  # or any script name
 
-Pywebpack will copy all bundles static files in the same working directory.
-It is **important** to name assets with distinct filenames, or create a
-namespaced subfolder to contain your static files, so that name collisions
-will be avoided.
+Since Pywebpack will copy all bundles static files in the same working
+directory, it is **important** to name assets with distinct filenames, or
+create a namespaced subfolder to contain your static files. In this way there
+won't be any file naming conflict.
 
 In our main script, let's add two bundles (called ``mainsite`` and
 ``backoffice``)::
 
-    from pywebpack.bundle import WebpackBundle
+    from pywebpack import WebpackBundle
     mainsite = WebpackBundle(
         './modules/mainsite/static',
         entry={
@@ -148,7 +153,7 @@ extra npm package.
 Then, we create a project :class:`~pywebpack.project.WebpackBundleProject`
 for our bundles::
 
-    from pywebpack.project import WebpackBundleProject
+    from pywebpack import WebpackBundleProject
     project = WebpackBundleProject(
         working_dir='build',  # where config and assets files will be copied
         project_template_dir='buildconfig',  #`webpack.config.js` location
@@ -156,17 +161,26 @@ for our bundles::
     )
 
 Pywebpack will generate a ``config.json`` which will contain all the assets
-with their paths. Each bundle entry will be a `webpack entry`_.
+with their paths. Each bundle entry will be a `webpack entry`_::
+
+    {
+        "entry": {
+            "backoffice-base": "./js/backoffice-base.js",
+            "backoffice-admin": "./js/backoffice-admin.js",
+            "mainsite-base": "./js/mainsite-base.js",
+            "mainsite-products": "./js/mainsite-products.js"
+        }
+    }
 
 As last step, in our ``webpack.config.js``, we set the entry to the
 ``config.json`` so webpack will build each asset::
 
     var path = require('path');
-    var config = require('./config')
+    var config = require('./config')  // Read config.json written by Python
 
     module.exports = {
         context: path.resolve(__dirname),
-        entry: config.entry,
+        entry: config.entry,  // Entries from mainsite and backoffice bundles.
         output: {
             filename: '[name].js',
             path: path.resolve(__dirname, 'dist')
@@ -185,7 +199,7 @@ Bundles can declare extra npm packages needed to build the assets. Pywebpack
 supports ``dependencies``, ``devDependencies`` and ``peerDependencies``.
 
 Dependencies will be merged to a common list. In case the same dependency is
-defined multiple times with different version, only the highest version that
+defined multiple times with different versions, only the highest version that
 satisfies all of them is kept. For more information, see the documentation of
 `node-semver`_.
 
@@ -195,10 +209,10 @@ Extension points
 With Pywebpack, we can "expose" bundles of our module so we can dynamically
 build assets of other installed modules.
 
-Let's define a module and expose it as an entry point. In
+Let's define a module and expose it as a Python entry point. In
 ``mymodule.bundles.py``::
 
-    from pywebpack.bundle import WebpackBundle
+    from pywebpack import WebpackBundle
     css = WebpackBundle(
         __name__,
         entry={
@@ -226,13 +240,12 @@ In our main project, we can now define a
 :class:`~pywebpack.project.WebpackBundleProject` that dynamically uses the
 installed and exposed bundles::
 
-    from pywebpack import bundles_from_entry_point
-    from pywebpack.project import WebpackBundleProject
+    from pywebpack import bundles_from_entry_point, WebpackBundleProject
     project = WebpackBundleProject(
         __name__,
         project_folder='assets',
         config_path='build/config.json',
-        bundles=bundles_from_entry_point('mymodule.webpack_bundles'),
+        bundles=bundles_from_entry_point('webpack_bundles'),
     )
 
 When executing ``project.buildall()``, the bundles exposed as entry points will
@@ -241,8 +254,8 @@ be collected and built.
 Manifest
 --------
 
-A manifest is the output file created by ``webpack`` which contains the list of
-all generated assets.
+A manifest is an output file which contains the list of all generated assets.
+It is created by a webpack plugin during build time.
 It also helps you deal with long-term caching, by providing a mapping between
 the name of a resource and its "hashed" version::
 
@@ -250,7 +263,7 @@ the name of a resource and its "hashed" version::
       "main.js": "main.75244bb780acd727ebd3.js"
     }
 
-Pywebpack can parse the manifest file and make it available to your python
+Pywebpack can parse a manifest file and make it available to your Python
 project. It supports manifest files generated using `webpack-manifest-plugin`_,
 `webpack-yam-plugin`_ and `webpack-bundle-tracker`_.
 
