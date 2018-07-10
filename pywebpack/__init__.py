@@ -41,7 +41,7 @@ folder::
       }
     };
 
-Now, let's add to the ``packages.json`` a run script ``build`` that executes
+Now, let's add to the ``package.json`` a run script ``build`` that executes
 webpack::
 
     "scripts": {
@@ -64,8 +64,8 @@ entry points::
 
     project.build()
 
-Alternative, :meth:`~pywebpack.project.WebpackProject.buildall` can be used to
-execute both tasks at once.
+Alternatively, :meth:`~pywebpack.project.WebpackProject.buildall` can be used
+to execute both tasks at once.
 
 Build time config
 -----------------
@@ -90,7 +90,7 @@ Assets for multiple modules
 
 When you have more complex Python projects with multiple modules, each module
 could declare and use different assets. With Pywebpack, we can define a
-:class:`~pywebpack.bundle.WebpackBundle`:: for each module and list the needed
+:class:`~pywebpack.bundle.WebpackBundle` for each module and list the needed
 assets and npm dependencies.
 
 We can then declare a :class:`~pywebpack.project.WebpackBundleProject` that
