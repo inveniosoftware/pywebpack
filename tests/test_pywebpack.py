@@ -197,7 +197,6 @@ def test_bundleproject(builddir, bundledir, destdir):
 @pytest.mark.xfail(raises=RuntimeError)
 def test_bundle_duplicated_entries(builddir, bundledir, bundledir2, destdir):
     """Test bundles with duplicated entries."""
-    entry = {'app': './index.js'}
     bundle1 = WebpackBundle(
         bundledir,
         entry={'app': './index.js'},
