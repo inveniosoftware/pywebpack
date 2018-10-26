@@ -17,7 +17,16 @@ class WebpackBundle(object):
 
     def __init__(self, path, entry=None, dependencies=None,
                  devDependencies=None, peerDependencies=None):
-        """Initialize webpack bundle."""
+        """Initialize webpack bundle.
+
+        :param path: Absolute path to the folder where the assets are
+            located.
+        :param entry: webpack entry; it indicates which modules webpack
+            should use to begin building out its internal dependency graph.
+        :param dependencies: npm dependencies.
+        :param devDependencies: npm dev dependencies.
+        :param peerDependencies: npm peer dependencies.
+        """
         self.path = path
         self.entry = entry or {}
         self.dependencies = {
