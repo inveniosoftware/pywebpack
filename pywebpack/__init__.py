@@ -308,12 +308,12 @@ from __future__ import absolute_import, print_function
 
 from .bundle import WebpackBundle
 from .helpers import bundles_from_entry_point
-from .manifests import Manifest, ManifestEntry, ManifestLoader, \
-    WebpackManifestFactory, WebpackYamFactory, WebpackBundleTrackerFactory, \
-    ManifestError, InvalidManifestError, UnfinishedManifestError,  \
-    UnsupportedExtensionError, UnsupportedManifestError
-from .project import WebpackProject, WebpackTemplateProject, \
-    WebpackBundleProject
+from .manifests import InvalidManifestError, Manifest, ManifestEntry, \
+    ManifestError, ManifestLoader, UnfinishedManifestError, \
+    UnsupportedExtensionError, UnsupportedManifestError, \
+    WebpackBundleTrackerFactory, WebpackManifestFactory, WebpackYamFactory
+from .project import WebpackBundleProject, WebpackProject, \
+    WebpackTemplateProject
 from .storage import FileStorage, LinkStorage
 from .version import __version__
 
