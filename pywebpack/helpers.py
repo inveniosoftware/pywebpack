@@ -17,9 +17,14 @@ import pkg_resources
 from semver import max_satisfying
 
 
+def _load_ep(ep):
+    mod = ep.load()
+    return mod() if callable(mod) else mod
+
+
 def bundles_from_entry_point(group):
     """Load bundles from entry point group."""
-    return (ep.load() for ep in pkg_resources.iter_entry_points(group))
+    return (_load_ep(ep) for ep in pkg_resources.iter_entry_points(group))
 
 
 def cached(f):
