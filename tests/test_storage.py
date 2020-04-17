@@ -15,7 +15,7 @@ import time
 from os import remove, symlink, utime
 from os.path import exists, getmtime, islink, join, realpath
 
-from pywebpack.storage import FileStorage, LinkStorage, iter_files
+from pywebpack.storage import FileStorage, LinkStorage, iter_files, iter_paths
 
 
 def test_iterfiles(sourcedir):
@@ -26,10 +26,34 @@ def test_iterfiles(sourcedir):
         'buildtpl/webpack.config.js',
         'bundle/index.js',
         'bundle2/main.js',
+        'just-a-file.js',
         'simple/index.js',
         'simple/package.json',
         'simple/webpack.config.js'
     ]
+
+
+def test_iterpaths(sourcedir):
+    """Test paths iteration."""
+    # no args has same behavior as "iter_files" from above
+    assert set(iter_paths(sourcedir)) == set(iter_files(sourcedir))
+    # depth 2 in this case would be also the same...
+    assert set(iter_paths(sourcedir, depth=2)) == set(iter_files(sourcedir))
+    # ...higher depths shouldn't affect the result either
+    assert set(iter_paths(sourcedir, depth=3)) == set(iter_files(sourcedir))
+
+    # depth 0 returns itself
+    assert set(iter_paths(sourcedir, depth=0)) == {(sourcedir, '.')}
+
+    # depth 1 returns first level of files and folders
+    assert {x[1] for x in iter_paths(sourcedir, depth=1)} == {
+        'broken',
+        'buildtpl',
+        'bundle',
+        'bundle2',
+        'simple',
+        'just-a-file.js',
+    }
 
 
 def test_filestorage(sourcedir, tmpdir):
