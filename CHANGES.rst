@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 1.0.2 (released 2020-04-28)
+
+- Adds a ``depth`` parameter to LinkStorage to allow for higher level
+  symlinking on the folder-level.
+
 Version 1.0.1 (released 2020-02-14)
 
 - Adds support for having bundles that are callables in
