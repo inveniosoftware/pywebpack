@@ -63,7 +63,8 @@ def test_invalid_ext():
 def test_factory(bundletracker_path, yam_path, manifest_path):
     """Test factories."""
     m = WebpackBundleTrackerFactory().load(bundletracker_path)
-    assert m.app
+    assert m['app.js']
+    assert m['app.css']
     m = WebpackYamFactory().load(yam_path)
     assert m.app
     WebpackManifestFactory().load(manifest_path)

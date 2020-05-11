@@ -187,9 +187,22 @@ class WebpackBundleTrackerFactory(ManifestFactory):
             raise UnfinishedManifestError(data)
 
         manifest = self.create_manifest()
-        for entry_name, paths in data['chunks'].items():
-            manifest.add(self.create_entry(
-                entry_name, [x['publicPath'] for x in paths]))
+        chunks = data['chunks']
+        assets = data['assets']
+        for entry_name, paths in chunks.items():
+            js_paths = [p for p in paths if p.endswith('.js')]
+            if js_paths:
+                manifest.add(self.create_entry(
+                    entry_name + '.js',
+                    [assets[p]['publicPath'] for p in js_paths]
+                ))
+
+            css_paths = [p for p in paths if p.endswith('.css')]
+            if css_paths:
+                manifest.add(self.create_entry(
+                    entry_name + '.css',
+                    [assets[p]['publicPath'] for p in css_paths]
+                ))
         return manifest
 
 

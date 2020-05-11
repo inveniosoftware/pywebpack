@@ -1,10 +1,21 @@
 {
   "status": "done",
   "chunks": {
-    "app": [{
+    "app": [
+      "app-0828904584990b611fb8.js",
+      "app-0828904584990b611fb8.css"
+    ]
+  },
+  "assets": {
+    "app-0828904584990b611fb8.js": {
       "name": "app-0828904584990b611fb8.js",
       "publicPath": "http://localhost:3000/assets/bundles/app-0828904584990b611fb8.js",
       "path": "/home/user/project-root/assets/bundles/app-0828904584990b611fb8.js"
-    }]
+    },
+    "app-0828904584990b611fb8.css": {
+      "name": "app-0828904584990b611fb8.css",
+      "publicPath": "http://localhost:3000/assets/bundles/app-0828904584990b611fb8.css",
+      "path": "/home/user/project-root/assets/bundles/app-0828904584990b611fb8.css"
+    }
   }
 }
