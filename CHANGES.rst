@@ -1,6 +1,10 @@
 Changes
 =======
 
+Version 1.0.3 (released 2020-05-12)
+
+- Fixes issue with incorrect parsing of webpack-bundle-tracker manifests.
+
 Version 1.0.2 (released 2020-04-28)
 
 - Adds a ``depth`` parameter to LinkStorage to allow for higher level
