@@ -16,7 +16,8 @@ class WebpackBundle(object):
     """Webpack bundle."""
 
     def __init__(self, path, entry=None, dependencies=None,
-                 devDependencies=None, peerDependencies=None):
+                 devDependencies=None, peerDependencies=None,
+                 aliases=None):
         """Initialize webpack bundle.
 
         :param path: Absolute path to the folder where the assets are
@@ -26,6 +27,7 @@ class WebpackBundle(object):
         :param dependencies: npm dependencies.
         :param devDependencies: npm dev dependencies.
         :param peerDependencies: npm peer dependencies.
+        :param aliases: Webpack resolver aliases.
         """
         self.path = path
         self.entry = entry or {}
@@ -34,3 +36,4 @@ class WebpackBundle(object):
             'devDependencies': devDependencies or {},
             'peerDependencies': peerDependencies or {},
         }
+        self.aliases = aliases or {}

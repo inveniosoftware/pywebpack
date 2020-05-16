@@ -146,12 +146,14 @@ def test_templateproject_buildall(templatedir, destdir):
 def test_bundleproject(builddir, bundledir, destdir):
     """Test bundle project."""
     entry = {'app': './index.js'}
+    aliases = {'@app': 'index.js'}
     bundle = WebpackBundle(
         bundledir,
         entry=entry,
         dependencies={
             'lodash': '~4',
-        }
+        },
+        aliases=aliases,
     )
     project = WebpackBundleProject(
         working_dir=destdir,
@@ -162,7 +164,7 @@ def test_bundleproject(builddir, bundledir, destdir):
 
     assert project.bundles == [bundle]
     assert project.entry == entry
-    assert project.config == {'entry': entry, 'test': True}
+    assert project.config == {'entry': entry, 'test': True, 'aliases': aliases}
     assert project.dependencies == {
         'dependencies': {
             'lodash': '~4',

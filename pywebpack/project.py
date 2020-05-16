@@ -203,8 +203,28 @@ class WebpackBundleProject(WebpackTemplateProject):
     def config(self):
         """Inject webpack entry points from bundles."""
         config = super(WebpackBundleProject, self).config
-        config.update({'entry': self.entry})
+        config.update({'entry': self.entry, 'aliases': self.aliases})
         return config
+
+    @property
+    def aliases(self):
+        """Get webpack resolver aliases from bundles."""
+        aliases = dict(aliases=dict(), paths=dict())
+        error = 'Duplicated alias for `{0}:{1}` in bundle `{2}` and ' \
+            '`{3}:{4}` in bundle `{5}`. Please choose another alias name.'
+
+        for bundle in self.bundles:
+            for alias, path in bundle.aliases.items():
+                # Check that there are no duplicated aliases
+                if alias in aliases['aliases']:
+                    prev_path, prev_bundle_path = aliases['paths'][alias]
+                    raise RuntimeError(error.format(
+                        alias, prev_path, prev_bundle_path,
+                        alias, path, bundle.path))
+                aliases['paths'][alias] = (path, bundle.path)
+
+            aliases['aliases'].update(bundle.aliases)
+        return aliases['aliases']
 
     @property
     @cached
