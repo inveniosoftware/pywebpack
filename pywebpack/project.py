@@ -18,7 +18,7 @@ from os.path import dirname, exists, join
 
 from pynpm import NPMPackage, YarnPackage
 
-from .helpers import cached, merge_deps
+from .helpers import cached, check_exit, merge_deps
 from .storage import FileStorage
 
 
@@ -46,6 +46,7 @@ class WebpackProject(object):
         """Get API to NPM package."""
         return NPMPackage(self.path)
 
+    @check_exit
     def install(self, *args):
         """Install project."""
         return self.npmpkg.install(*args)
@@ -57,6 +58,7 @@ class WebpackProject(object):
             raise RuntimeError('Invalid NPM script.')
         return self.npmpkg.run_script(script_name, *args)
 
+    @check_exit
     def build(self, *args):
         """Run build script."""
         return self.run('build', *args)

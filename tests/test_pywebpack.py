@@ -12,6 +12,7 @@
 from __future__ import absolute_import, print_function
 
 import json
+import os
 from os.path import exists, join
 
 import pytest
@@ -83,6 +84,14 @@ def test_project_buildall(simpleprj):
 
 def test_project_no_scripts(brokenprj):
     project = WebpackProject(brokenprj)
+    with pytest.raises(RuntimeError):
+        project.buildall()
+
+
+def test_project_failed_build(simpleprj):
+    # Remove a file necessary for the build
+    os.unlink(os.path.join(os.path.dirname(simpleprj), 'index.js'))
+    project = WebpackProject(simpleprj)
     with pytest.raises(RuntimeError):
         project.buildall()
 
