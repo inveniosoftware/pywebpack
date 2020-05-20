@@ -11,8 +11,9 @@
 
 from __future__ import absolute_import, print_function
 
-from os import makedirs, remove, scandir, symlink, walk
-from os.path import dirname, exists, getmtime, islink, join, realpath, relpath
+from os import listdir, makedirs, remove, symlink, walk
+from os.path import dirname, exists, getmtime, isfile, islink, join, \
+    realpath, relpath
 from shutil import copy
 
 
@@ -30,19 +31,21 @@ def iter_paths(folder, root=None, depth=None):
     root = root or folder  # needed to compute the relative name
 
     if depth is None:  # yield all paths
-        yield from iter_files(folder)
+        for result in iter_files(folder):
+            yield result
     elif depth == 0:
         yield folder, relpath(folder, root)
     else:
-        for entry in scandir(folder):
-            if entry.is_file():  # always yield files no matter the depth
-                f = join(folder, entry.name)
+        for entry in listdir(folder):
+            if isfile(join(folder, entry)):
+                # Always yield files no matter the depth
+                f = join(folder, entry)
                 yield f, relpath(f, root)
             else:
-                yield from iter_paths(
-                    join(folder, entry.name),
-                    root=root, depth=(depth - 1)
-                )
+                for result in iter_paths(
+                    join(folder, entry), root=root, depth=(depth - 1)
+                ):
+                    yield result
 
 
 class FileStorage(object):
@@ -81,9 +84,9 @@ class FileStorage(object):
 class LinkStorage(FileStorage):
     """Storage class that link files."""
 
-    def __init__(self, *args, depth=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         """Initialize storage."""
-        self.depth = depth
+        self.depth = kwargs.pop('depth', None)
         super(LinkStorage, self).__init__(*args, **kwargs)
 
     def __iter__(self):
