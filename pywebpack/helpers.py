@@ -38,6 +38,17 @@ def cached(f):
     return inner
 
 
+def check_exit(f):
+    """Decorator to ensure that an NPM process exited successfully."""
+    @wraps(f)
+    def inner(self, *args, **kwargs):
+        exit_code = f(self, *args, **kwargs)
+        if exit_code != 0:
+            raise RuntimeError("Process exited with code {}".format(exit_code))
+        return exit_code
+    return inner
+
+
 def merge_deps(deps, bundles_deps):
     """Merge NPM dependencies."""
     keys = ['dependencies', 'devDependencies', 'peerDependencies']
