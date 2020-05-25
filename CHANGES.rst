@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 1.1.0 (released 2020-05-25)
+
+- Adds support for collecting aliases from bundles.
+- Restore Python 2 compatibility.
+
 Version 1.0.4 (released 2020-05-25)
 
 - Python commands now fail when the NPM processes exit with an error.
