@@ -1,6 +1,10 @@
 Changes
 =======
 
+Version 1.0.4 (released 2020-05-25)
+
+- Python commands now fail when the NPM processes exit with an error.
+
 Version 1.0.3 (released 2020-05-12)
 
 - Fixes issue with incorrect parsing of webpack-bundle-tracker manifests.
