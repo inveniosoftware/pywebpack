@@ -2,8 +2,8 @@
  PyWebpack
 ===========
 
-.. image:: https://img.shields.io/travis/inveniosoftware/pywebpack.svg
-        :target: https://travis-ci.org/inveniosoftware/pywebpack
+.. image:: https://github.com/inveniosoftware/pywebpack/workflows/CI/badge.svg
+        :target: https://github.com/inveniosoftware/pywebpack/actions?query=workflow%3ACI
 
 .. image:: https://img.shields.io/coveralls/inveniosoftware/pywebpack.svg
         :target: https://coveralls.io/r/inveniosoftware/pywebpack
