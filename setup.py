@@ -17,7 +17,6 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    "pydocstyle>=1.0.0",
     "pytest-cache>=1.0",
     "pytest-invenio>=1.4.0"
 ]
