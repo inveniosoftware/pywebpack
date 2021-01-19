@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 1.2.0 (released 2021-01-21)
+
+- Fixes an issue where if you were using WebpackBundleProject with
+  the LinkStorage to make symlinks, you would end up having your source
+  package.json overwritten.
+
 Version 1.1.0 (released 2020-05-25)
 
 - Adds support for collecting aliases from bundles.
