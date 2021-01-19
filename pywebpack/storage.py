@@ -68,10 +68,13 @@ class FileStorage(object):
             remove(dst)
         copy(src, dst)
 
-    def run(self, force=None):
+    def run(self, force=None, skip=None):
         """Copy files from source to destination."""
         force = force or {}
+        skip = skip or []
         for fsrc, relpath in self:
+            if relpath in skip:
+                continue
             fdst = join(self.dstdir, relpath)
             fdstdir = dirname(fdst)
 
