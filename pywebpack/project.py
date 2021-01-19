@@ -114,10 +114,10 @@ class WebpackTemplateProject(WebpackProject):
         """Storage class property."""
         return self._storage_cls
 
-    def create(self, force=None):
+    def create(self, force=None, skip=None):
         """Create webpack project from a template."""
         self.storage_cls(self._project_template_dir, self.project_path).run(
-            force=force)
+            force=force, skip=skip)
 
         # Write config if not empty
         config = self.config
@@ -145,7 +145,8 @@ class WebpackBundleProject(WebpackTemplateProject):
     """Build webpack project from multiple bundles."""
 
     def __init__(self, working_dir, project_template_dir, bundles=None,
-                 config=None, config_path=None, storage_cls=None):
+                 config=None, config_path=None, storage_cls=None,
+                 package_json_source_path='package.json'):
         """Initialize templated folder.
 
         :param working_dir: Path where config and assets files will be copied.
@@ -162,8 +163,11 @@ class WebpackBundleProject(WebpackTemplateProject):
         :param config_path: Path in `working_dir` where `config.json` will
             be written.
         :param storage_cls: Storage class.
+        :param package_json_source_path: Path relative to
+            `project_template_dir` to the project's package.json.
         """
         self._bundles_iter = bundles or []
+        self._package_json_source_path = package_json_source_path
         super(WebpackBundleProject, self).__init__(
             working_dir,
             project_template_dir=project_template_dir,
@@ -171,6 +175,19 @@ class WebpackBundleProject(WebpackTemplateProject):
             config_path=config_path,
             storage_cls=storage_cls,
         )
+
+    @property
+    def package_json_source_path(self):
+        """Full path to the source package.json."""
+        return join(
+            self._project_template_dir, self._package_json_source_path)
+
+    @property
+    @cached
+    def package_json_source(self):
+        """Read original package.json contents."""
+        with open(self.package_json_source_path, 'r') as fp:
+            return json.load(fp)
 
     @property
     @cached
@@ -243,26 +260,30 @@ class WebpackBundleProject(WebpackTemplateProject):
     @cached
     def package_json(self):
         """Merge bundle dependencies into ``package.json``."""
-        return merge_deps(self.npmpkg.package_json, self.dependencies)
+        # Reads package.json from the project_template_dir and merges in
+        # bundle dependencies. Note, that package.json is not symlinked
+        # because then we risk changing the source package.json automatically.
+        return merge_deps(self.package_json_source, self.dependencies)
 
     def collect(self, force=None):
         """Collect asset files from bundles."""
         for b in self.bundles:
             self.storage_cls(b.path, self.project_path).run(force=force)
 
-    def create(self, force={'package.json'}):
+    def create(self, force=None):
         """Create webpack project from a template.
 
         This command collects all asset files from the bundles.
         It generates a new package.json by merging the package.json
         dependencies of each bundle.
         """
-        # Force package.json to be overwritten always.
-        super(WebpackBundleProject, self).create(force=force)
+        # Skip package.json (because we will always write a new).
+        super(WebpackBundleProject, self).create(
+            force=force, skip=['package.json'])
         # Collect all asset files from the bundles.
         self.collect(force=force)
-        # Generate new package json (reads the package.json and merges in
-        # npm dependencies; must be done before opening the file for writing)
+        # Generate new package json (reads the package.json source and merges
+        # in npm dependencies).
         package_json = self.package_json
         # Write package.json (with collected dependencies)
         with open(self.npmpkg.package_json_path, 'w') as fp:
