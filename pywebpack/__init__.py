@@ -315,7 +315,8 @@ from .manifests import InvalidManifestError, Manifest, ManifestEntry, \
 from .project import WebpackBundleProject, WebpackProject, \
     WebpackTemplateProject
 from .storage import FileStorage, LinkStorage
-from .version import __version__
+
+__version__ = '1.2.0'
 
 __all__ = (
     '__version__',
