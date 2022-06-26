@@ -12,8 +12,7 @@
 from __future__ import absolute_import, print_function
 
 from os import listdir, makedirs, remove, symlink, walk
-from os.path import dirname, exists, getmtime, isfile, islink, join, \
-    realpath, relpath
+from os.path import dirname, exists, getmtime, isfile, islink, join, realpath, relpath
 from shutil import copy
 
 
@@ -89,7 +88,7 @@ class LinkStorage(FileStorage):
 
     def __init__(self, *args, **kwargs):
         """Initialize storage."""
-        self.depth = kwargs.pop('depth', None)
+        self.depth = kwargs.pop("depth", None)
         super(LinkStorage, self).__init__(*args, **kwargs)
 
     def __iter__(self):
@@ -100,8 +99,7 @@ class LinkStorage(FileStorage):
     def _copyfile(self, src, dst, force=False):
         """Symlink file from source to destination."""
         if exists(dst):
-            if (not islink(dst) or realpath(src) == realpath(dst)) \
-                    and not force:
+            if (not islink(dst) or realpath(src) == realpath(dst)) and not force:
                 return
             remove(dst)
         symlink(src, dst)

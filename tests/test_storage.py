@@ -21,15 +21,15 @@ from pywebpack.storage import FileStorage, LinkStorage, iter_files, iter_paths
 def test_iterfiles(sourcedir):
     """Test file iteration."""
     assert sorted([x[1] for x in iter_files(sourcedir)]) == [
-        'broken/package.json',
-        'buildtpl/package.json',
-        'buildtpl/webpack.config.js',
-        'bundle/index.js',
-        'bundle2/main.js',
-        'just-a-file.js',
-        'simple/index.js',
-        'simple/package.json',
-        'simple/webpack.config.js'
+        "broken/package.json",
+        "buildtpl/package.json",
+        "buildtpl/webpack.config.js",
+        "bundle/index.js",
+        "bundle2/main.js",
+        "just-a-file.js",
+        "simple/index.js",
+        "simple/package.json",
+        "simple/webpack.config.js",
     ]
 
 
@@ -43,23 +43,23 @@ def test_iterpaths(sourcedir):
     assert set(iter_paths(sourcedir, depth=3)) == set(iter_files(sourcedir))
 
     # depth 0 returns itself
-    assert set(iter_paths(sourcedir, depth=0)) == {(sourcedir, '.')}
+    assert set(iter_paths(sourcedir, depth=0)) == {(sourcedir, ".")}
 
     # depth 1 returns first level of files and folders
     assert {x[1] for x in iter_paths(sourcedir, depth=1)} == {
-        'broken',
-        'buildtpl',
-        'bundle',
-        'bundle2',
-        'simple',
-        'just-a-file.js',
+        "broken",
+        "buildtpl",
+        "bundle",
+        "bundle2",
+        "simple",
+        "just-a-file.js",
     }
 
 
 def test_filestorage(sourcedir, tmpdir):
     """Test file storage copy."""
-    fsrc = join(sourcedir, 'simple/package.json')
-    fdst = join(tmpdir, 'simple/package.json')
+    fsrc = join(sourcedir, "simple/package.json")
+    fdst = join(tmpdir, "simple/package.json")
 
     fs = FileStorage(sourcedir, tmpdir)
 
@@ -84,8 +84,8 @@ def test_filestorage(sourcedir, tmpdir):
 
 def test_linkstorage(sourcedir, tmpdir):
     """Test file storage copy."""
-    fsrc = join(sourcedir, 'simple/package.json')
-    fdst = join(tmpdir, 'simple/package.json')
+    fsrc = join(sourcedir, "simple/package.json")
+    fdst = join(tmpdir, "simple/package.json")
 
     fs = LinkStorage(sourcedir, tmpdir)
 

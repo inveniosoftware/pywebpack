@@ -308,34 +308,42 @@ from __future__ import absolute_import, print_function
 
 from .bundle import WebpackBundle
 from .helpers import bundles_from_entry_point
-from .manifests import InvalidManifestError, Manifest, ManifestEntry, \
-    ManifestError, ManifestLoader, UnfinishedManifestError, \
-    UnsupportedExtensionError, UnsupportedManifestError, \
-    WebpackBundleTrackerFactory, WebpackManifestFactory, WebpackYamFactory
-from .project import WebpackBundleProject, WebpackProject, \
-    WebpackTemplateProject
+from .manifests import (
+    InvalidManifestError,
+    Manifest,
+    ManifestEntry,
+    ManifestError,
+    ManifestLoader,
+    UnfinishedManifestError,
+    UnsupportedExtensionError,
+    UnsupportedManifestError,
+    WebpackBundleTrackerFactory,
+    WebpackManifestFactory,
+    WebpackYamFactory,
+)
+from .project import WebpackBundleProject, WebpackProject, WebpackTemplateProject
 from .storage import FileStorage, LinkStorage
 
-__version__ = '1.2.0'
+__version__ = "1.2.0"
 
 __all__ = (
-    '__version__',
-    'bundles_from_entry_point',
-    'FileStorage',
-    'InvalidManifestError',
-    'LinkStorage',
-    'Manifest',
-    'ManifestEntry',
-    'ManifestError',
-    'ManifestLoader',
-    'UnfinishedManifestError',
-    'UnsupportedExtensionError',
-    'UnsupportedManifestError',
-    'WebpackBundle',
-    'WebpackBundleProject',
-    'WebpackBundleTrackerFactory',
-    'WebpackManifestFactory',
-    'WebpackProject',
-    'WebpackTemplateProject',
-    'WebpackYamFactory',
+    "__version__",
+    "bundles_from_entry_point",
+    "FileStorage",
+    "InvalidManifestError",
+    "LinkStorage",
+    "Manifest",
+    "ManifestEntry",
+    "ManifestError",
+    "ManifestLoader",
+    "UnfinishedManifestError",
+    "UnsupportedExtensionError",
+    "UnsupportedManifestError",
+    "WebpackBundle",
+    "WebpackBundleProject",
+    "WebpackBundleTrackerFactory",
+    "WebpackManifestFactory",
+    "WebpackProject",
+    "WebpackTemplateProject",
+    "WebpackYamFactory",
 )

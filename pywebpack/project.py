@@ -54,15 +54,15 @@ class WebpackProject(object):
 
     def run(self, script_name, *args):
         """Run an NPM script."""
-        scripts = self.npmpkg.package_json.get('scripts', {}).keys()
+        scripts = self.npmpkg.package_json.get("scripts", {}).keys()
         if script_name not in scripts:
-            raise RuntimeError('Invalid NPM script.')
+            raise RuntimeError("Invalid NPM script.")
         return self.npmpkg.run_script(script_name, *args)
 
     @check_exit
     def build(self, *args):
         """Run build script."""
-        return self.run('build', *args)
+        return self.run("build", *args)
 
     def buildall(self):
         """Build project from scratch."""
@@ -78,8 +78,14 @@ class WebpackTemplateProject(WebpackProject):
     path as well.
     """
 
-    def __init__(self, working_dir, project_template_dir, config=None,
-                 config_path=None, storage_cls=None):
+    def __init__(
+        self,
+        working_dir,
+        project_template_dir,
+        config=None,
+        config_path=None,
+        storage_cls=None,
+    ):
         """Initialize templated folder.
 
         :param working_dir: Path where config and assets files will be copied.
@@ -93,7 +99,7 @@ class WebpackTemplateProject(WebpackProject):
         self._project_template_dir = project_template_dir
         self._storage_cls = storage_cls or FileStorage
         self._config = config
-        self._config_path = config_path or 'config.json'
+        self._config_path = config_path or "config.json"
         super(WebpackTemplateProject, self).__init__(working_dir)
 
     @property
@@ -117,7 +123,8 @@ class WebpackTemplateProject(WebpackProject):
     def create(self, force=None, skip=None):
         """Create webpack project from a template."""
         self.storage_cls(self._project_template_dir, self.project_path).run(
-            force=force, skip=skip)
+            force=force, skip=skip
+        )
 
         # Write config if not empty
         config = self.config
@@ -127,7 +134,7 @@ class WebpackTemplateProject(WebpackProject):
             if not exists(dirname(config_path)):
                 makedirs(dirname(config_path))
             # Write config.json
-            with open(config_path, 'w') as fp:
+            with open(config_path, "w") as fp:
                 json.dump(config, fp, indent=2, sort_keys=True)
 
     def clean(self):
@@ -144,9 +151,16 @@ class WebpackTemplateProject(WebpackProject):
 class WebpackBundleProject(WebpackTemplateProject):
     """Build webpack project from multiple bundles."""
 
-    def __init__(self, working_dir, project_template_dir, bundles=None,
-                 config=None, config_path=None, storage_cls=None,
-                 package_json_source_path='package.json'):
+    def __init__(
+        self,
+        working_dir,
+        project_template_dir,
+        bundles=None,
+        config=None,
+        config_path=None,
+        storage_cls=None,
+        package_json_source_path="package.json",
+    ):
         """Initialize templated folder.
 
         :param working_dir: Path where config and assets files will be copied.
@@ -179,14 +193,13 @@ class WebpackBundleProject(WebpackTemplateProject):
     @property
     def package_json_source_path(self):
         """Full path to the source package.json."""
-        return join(
-            self._project_template_dir, self._package_json_source_path)
+        return join(self._project_template_dir, self._package_json_source_path)
 
     @property
     @cached
     def package_json_source(self):
         """Read original package.json contents."""
-        with open(self.package_json_source_path, 'r') as fp:
+        with open(self.package_json_source_path, "r") as fp:
             return json.load(fp)
 
     @property
@@ -200,58 +213,67 @@ class WebpackBundleProject(WebpackTemplateProject):
     def entry(self):
         """Get webpack entry points."""
         entries = dict(entries=dict(), paths=dict())
-        error = 'Duplicated bundle entry for `{0}:{1}` in bundle `{2}` and ' \
-            '`{3}:{4}` in bundle `{5}`. Please choose another entry name.'
+        error = (
+            "Duplicated bundle entry for `{0}:{1}` in bundle `{2}` and "
+            "`{3}:{4}` in bundle `{5}`. Please choose another entry name."
+        )
 
         for bundle in self.bundles:
             for name, filepath in bundle.entry.items():
                 # check that there are no duplicated entries
-                if name in entries['entries']:
-                    prev_filepath, prev_bundle_path = entries['paths'][name]
-                    raise RuntimeError(error.format(name, prev_filepath,
-                                                    prev_bundle_path, name,
-                                                    filepath, bundle.path))
-                entries['paths'][name] = (filepath, bundle.path)
+                if name in entries["entries"]:
+                    prev_filepath, prev_bundle_path = entries["paths"][name]
+                    raise RuntimeError(
+                        error.format(
+                            name,
+                            prev_filepath,
+                            prev_bundle_path,
+                            name,
+                            filepath,
+                            bundle.path,
+                        )
+                    )
+                entries["paths"][name] = (filepath, bundle.path)
 
-            entries['entries'].update(bundle.entry)
-        return entries['entries']
+            entries["entries"].update(bundle.entry)
+        return entries["entries"]
 
     @property
     def config(self):
         """Inject webpack entry points from bundles."""
         config = super(WebpackBundleProject, self).config
-        config.update({'entry': self.entry, 'aliases': self.aliases})
+        config.update({"entry": self.entry, "aliases": self.aliases})
         return config
 
     @property
     def aliases(self):
         """Get webpack resolver aliases from bundles."""
         aliases = dict(aliases=dict(), paths=dict())
-        error = 'Duplicated alias for `{0}:{1}` in bundle `{2}` and ' \
-            '`{3}:{4}` in bundle `{5}`. Please choose another alias name.'
+        error = (
+            "Duplicated alias for `{0}:{1}` in bundle `{2}` and "
+            "`{3}:{4}` in bundle `{5}`. Please choose another alias name."
+        )
 
         for bundle in self.bundles:
             for alias, path in bundle.aliases.items():
                 # Check that there are no duplicated aliases
-                if alias in aliases['aliases']:
-                    prev_path, prev_bundle_path = aliases['paths'][alias]
-                    raise RuntimeError(error.format(
-                        alias, prev_path, prev_bundle_path,
-                        alias, path, bundle.path))
-                aliases['paths'][alias] = (path, bundle.path)
+                if alias in aliases["aliases"]:
+                    prev_path, prev_bundle_path = aliases["paths"][alias]
+                    raise RuntimeError(
+                        error.format(
+                            alias, prev_path, prev_bundle_path, alias, path, bundle.path
+                        )
+                    )
+                aliases["paths"][alias] = (path, bundle.path)
 
-            aliases['aliases'].update(bundle.aliases)
-        return aliases['aliases']
+            aliases["aliases"].update(bundle.aliases)
+        return aliases["aliases"]
 
     @property
     @cached
     def dependencies(self):
         """Get package.json dependencies."""
-        res = {
-            'dependencies': {},
-            'devDependencies': {},
-            'peerDependencies': {}
-        }
+        res = {"dependencies": {}, "devDependencies": {}, "peerDependencies": {}}
         for b in self.bundles:
             merge_deps(res, b.dependencies)
         return res
@@ -278,13 +300,12 @@ class WebpackBundleProject(WebpackTemplateProject):
         dependencies of each bundle.
         """
         # Skip package.json (because we will always write a new).
-        super(WebpackBundleProject, self).create(
-            force=force, skip=['package.json'])
+        super(WebpackBundleProject, self).create(force=force, skip=["package.json"])
         # Collect all asset files from the bundles.
         self.collect(force=force)
         # Generate new package json (reads the package.json source and merges
         # in npm dependencies).
         package_json = self.package_json
         # Write package.json (with collected dependencies)
-        with open(self.npmpkg.package_json_path, 'w') as fp:
+        with open(self.npmpkg.package_json_path, "w") as fp:
             json.dump(package_json, fp, indent=2, sort_keys=True)

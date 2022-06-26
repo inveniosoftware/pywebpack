@@ -16,7 +16,7 @@ import json
 import sys
 from os.path import splitext
 
-_string_types = (str, ) if sys.version_info[0] == 3 else (basestring, )
+_string_types = (str,) if sys.version_info[0] == 3 else (basestring,)
 
 
 #
@@ -55,7 +55,7 @@ class Manifest(object):
     def add(self, entry):
         """Add an entry to the manifest."""
         if entry.name in self._entries:
-            raise KeyError('Entry {} already present'.format(entry.name))
+            raise KeyError("Entry {} already present".format(entry.name))
         self._entries[entry.name] = entry
 
     def __getitem__(self, key):
@@ -67,7 +67,7 @@ class Manifest(object):
         try:
             return self._entries[name]
         except KeyError:
-            raise AttributeError('Attribute {} does not exists.'.format(name))
+            raise AttributeError("Attribute {} does not exists.".format(name))
 
     def __iter__(self):
         """Iterate over entries in the manifest."""
@@ -78,8 +78,8 @@ class ManifestEntry(object):
     """Represents a manifest entry."""
 
     templates = {
-        '.js': '<script src="{}"></script>',
-        '.css': '<link rel="stylesheet" href="{}" />',
+        ".js": '<script src="{}"></script>',
+        ".css": '<link rel="stylesheet" href="{}" />',
     }
 
     def __init__(self, name, paths):
@@ -96,7 +96,7 @@ class ManifestEntry(object):
             if tpl is None:
                 raise UnsupportedExtensionError(p)
             out.append(tpl.format(p))
-        return ''.join(out)
+        return "".join(out)
 
     def __iter__(self):
         """Iterate over files in the manifest entry."""
@@ -141,7 +141,7 @@ class WebpackManifestFactory(ManifestFactory):
         manifest = self.create_manifest()
         for entry_name, path in data.items():
             if not isinstance(path, _string_types):
-                raise InvalidManifestError('webpack-manifest-plugin')
+                raise InvalidManifestError("webpack-manifest-plugin")
             manifest.add(self.create_entry(entry_name, [path]))
         return manifest
 
@@ -153,13 +153,13 @@ class WebpackYamFactory(ManifestFactory):
         """Create manifest from parsed data."""
         # Is manifest of correct type?
         try:
-            status = data['status']
-            files = data['files']
+            status = data["status"]
+            files = data["files"]
         except KeyError:
-            raise InvalidManifestError('webpack-yam-plugin')
+            raise InvalidManifestError("webpack-yam-plugin")
 
         # Is manifest finished?
-        if files is None or status != 'built':
+        if files is None or status != "built":
             raise UnfinishedManifestError(data)
 
         manifest = self.create_manifest()
@@ -175,34 +175,37 @@ class WebpackBundleTrackerFactory(ManifestFactory):
         """Create manifest from parsed data."""
         # Is manifest of correct type?
         try:
-            status = data['status']
+            status = data["status"]
         except KeyError:
-            raise InvalidManifestError('webpack-bundle-tracker')
+            raise InvalidManifestError("webpack-bundle-tracker")
 
-        if 'chunks' not in data:
-            raise InvalidManifestError('webpack-bundle-tracker')
+        if "chunks" not in data:
+            raise InvalidManifestError("webpack-bundle-tracker")
 
         # Is manifest finished?
-        if status != 'done':
+        if status != "done":
             raise UnfinishedManifestError(data)
 
         manifest = self.create_manifest()
-        chunks = data['chunks']
-        assets = data['assets']
+        chunks = data["chunks"]
+        assets = data["assets"]
         for entry_name, paths in chunks.items():
-            js_paths = [p for p in paths if p.endswith('.js')]
+            js_paths = [p for p in paths if p.endswith(".js")]
             if js_paths:
-                manifest.add(self.create_entry(
-                    entry_name + '.js',
-                    [assets[p]['publicPath'] for p in js_paths]
-                ))
+                manifest.add(
+                    self.create_entry(
+                        entry_name + ".js", [assets[p]["publicPath"] for p in js_paths]
+                    )
+                )
 
-            css_paths = [p for p in paths if p.endswith('.css')]
+            css_paths = [p for p in paths if p.endswith(".css")]
             if css_paths:
-                manifest.add(self.create_entry(
-                    entry_name + '.css',
-                    [assets[p]['publicPath'] for p in css_paths]
-                ))
+                manifest.add(
+                    self.create_entry(
+                        entry_name + ".css",
+                        [assets[p]["publicPath"] for p in css_paths],
+                    )
+                )
         return manifest
 
 
@@ -228,8 +231,7 @@ class ManifestLoader(object):
         for t in self.types:
             try:
                 return t(
-                    manifest_cls=self.manifest_cls,
-                    entry_cls=self.entry_cls
+                    manifest_cls=self.manifest_cls, entry_cls=self.entry_cls
                 ).create(data)
             except InvalidManifestError:
                 pass

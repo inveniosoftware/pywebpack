@@ -15,9 +15,15 @@ from __future__ import absolute_import, print_function
 class WebpackBundle(object):
     """Webpack bundle."""
 
-    def __init__(self, path, entry=None, dependencies=None,
-                 devDependencies=None, peerDependencies=None,
-                 aliases=None):
+    def __init__(
+        self,
+        path,
+        entry=None,
+        dependencies=None,
+        devDependencies=None,
+        peerDependencies=None,
+        aliases=None,
+    ):
         """Initialize webpack bundle.
 
         :param path: Absolute path to the folder where the assets are
@@ -32,8 +38,8 @@ class WebpackBundle(object):
         self.path = path
         self.entry = entry or {}
         self.dependencies = {
-            'dependencies': dependencies or {},
-            'devDependencies': devDependencies or {},
-            'peerDependencies': peerDependencies or {},
+            "dependencies": dependencies or {},
+            "devDependencies": devDependencies or {},
+            "peerDependencies": peerDependencies or {},
         }
         self.aliases = aliases or {}

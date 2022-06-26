@@ -18,8 +18,12 @@ from os.path import exists, join
 
 import pytest
 
-from pywebpack import WebpackBundle, WebpackBundleProject, WebpackProject, \
-    WebpackTemplateProject
+from pywebpack import (
+    WebpackBundle,
+    WebpackBundleProject,
+    WebpackProject,
+    WebpackTemplateProject,
+)
 from pywebpack.helpers import merge_deps
 
 
@@ -32,28 +36,43 @@ def json_from_file(filepath):
 def test_version():
     """Test version import."""
     from pywebpack import __version__
+
     assert __version__
 
 
-@pytest.mark.parametrize("target,source,expected", [
-    ({},
-     {},
-     {'dependencies': {}, 'devDependencies': {}, 'peerDependencies': {}}),
-
-    ({},
-     {'dependencies': {'mypkg': '1.0'}},
-     {'dependencies': {'mypkg': '1.0'}, 'devDependencies': {},
-      'peerDependencies': {}}),
-
-    ({'dependencies': {'mypkg': '1.0'}},
-     {'dependencies': {'mypkg': '2.0'}},
-     {'dependencies': {'mypkg': '2.0'}, 'devDependencies': {},
-      'peerDependencies': {}}),
-
-    ({'dependencies': {'mypkg': '2.0'}}, {'dependencies': {'mypkg': '1.0'}},
-     {'dependencies': {'mypkg': '2.0'}, 'devDependencies': {},
-      'peerDependencies': {}})
-])
+@pytest.mark.parametrize(
+    "target,source,expected",
+    [
+        ({}, {}, {"dependencies": {}, "devDependencies": {}, "peerDependencies": {}}),
+        (
+            {},
+            {"dependencies": {"mypkg": "1.0"}},
+            {
+                "dependencies": {"mypkg": "1.0"},
+                "devDependencies": {},
+                "peerDependencies": {},
+            },
+        ),
+        (
+            {"dependencies": {"mypkg": "1.0"}},
+            {"dependencies": {"mypkg": "2.0"}},
+            {
+                "dependencies": {"mypkg": "2.0"},
+                "devDependencies": {},
+                "peerDependencies": {},
+            },
+        ),
+        (
+            {"dependencies": {"mypkg": "2.0"}},
+            {"dependencies": {"mypkg": "1.0"}},
+            {
+                "dependencies": {"mypkg": "2.0"},
+                "devDependencies": {},
+                "peerDependencies": {},
+            },
+        ),
+    ],
+)
 def test_merge_deps(target, source, expected):
     assert merge_deps(target, source) == expected
 
@@ -63,8 +82,8 @@ def test_project(simpleprj):
     project = WebpackProject(simpleprj)
     assert exists(project.project_path)
 
-    node_modules = join(project.project_path, 'node_modules')
-    bundlejs = join(project.project_path, 'dist/bundle.js')
+    node_modules = join(project.project_path, "node_modules")
+    bundlejs = join(project.project_path, "dist/bundle.js")
 
     assert not exists(node_modules)
     project.install()
@@ -79,8 +98,8 @@ def test_project_buildall(simpleprj):
     """Test build all."""
     project = WebpackProject(simpleprj)
     project.buildall()
-    assert exists(join(project.project_path, 'node_modules'))
-    assert exists(join(project.project_path, 'dist/bundle.js'))
+    assert exists(join(project.project_path, "node_modules"))
+    assert exists(join(project.project_path, "dist/bundle.js"))
 
 
 def test_project_no_scripts(brokenprj):
@@ -91,7 +110,7 @@ def test_project_no_scripts(brokenprj):
 
 def test_project_failed_build(simpleprj):
     # Remove a file necessary for the build
-    os.unlink(os.path.join(os.path.dirname(simpleprj), 'index.js'))
+    os.unlink(os.path.join(os.path.dirname(simpleprj), "index.js"))
     project = WebpackProject(simpleprj)
     with pytest.raises(RuntimeError):
         project.buildall()
@@ -116,7 +135,7 @@ def test_templateproject_clean(templatedir, destdir):
 
 def test_templateproject_create_config(templatedir, destdir):
     """Test template project creation."""
-    expected_config = {'entry': './index.js'}
+    expected_config = {"entry": "./index.js"}
 
     project = WebpackTemplateProject(
         working_dir=destdir,
@@ -134,24 +153,24 @@ def test_templateproject_buildall(templatedir, destdir):
     project = WebpackTemplateProject(
         working_dir=destdir,
         project_template_dir=templatedir,
-        config={'test': True},
-        config_path='build/config.json',
+        config={"test": True},
+        config_path="build/config.json",
     )
     project.buildall()
     assert exists(project.config_path)
-    assert exists(join(project.project_path, 'node_modules'))
-    assert exists(join(project.project_path, 'dist/bundle.js'))
+    assert exists(join(project.project_path, "node_modules"))
+    assert exists(join(project.project_path, "dist/bundle.js"))
 
 
 def test_bundleproject(builddir, bundledir, destdir):
     """Test bundle project."""
-    entry = {'app': './index.js'}
-    aliases = {'@app': 'index.js'}
+    entry = {"app": "./index.js"}
+    aliases = {"@app": "index.js"}
     bundle = WebpackBundle(
         bundledir,
         entry=entry,
         dependencies={
-            'lodash': '~4',
+            "lodash": "~4",
         },
         aliases=aliases,
     )
@@ -159,32 +178,27 @@ def test_bundleproject(builddir, bundledir, destdir):
         working_dir=destdir,
         project_template_dir=builddir,
         bundles=(x for x in [bundle]),  # Test for iterator evaluation
-        config={'test': True, 'entry': False},
+        config={"test": True, "entry": False},
     )
 
     assert project.bundles == [bundle]
     assert project.entry == entry
-    assert project.config == {'entry': entry, 'test': True, 'aliases': aliases}
+    assert project.config == {"entry": entry, "test": True, "aliases": aliases}
     assert project.dependencies == {
-        'dependencies': {
-            'lodash': '~4',
+        "dependencies": {
+            "lodash": "~4",
         },
-        'devDependencies': {},
-        'peerDependencies': {}
+        "devDependencies": {},
+        "peerDependencies": {},
     }
 
     project.create()
 
     # Assert generated files.
-    paths = [
-        'config.json',
-        'index.js',
-        'package.json',
-        'webpack.config.js'
-    ]
+    paths = ["config.json", "index.js", "package.json", "webpack.config.js"]
     distpaths = [
-        'dist/bundle.js',
-        'node_modules',
+        "dist/bundle.js",
+        "node_modules",
     ]
     for p in paths:
         assert exists(join(project.project_path, p))
@@ -194,10 +208,10 @@ def test_bundleproject(builddir, bundledir, destdir):
     # Assert generated package.json
     package_json = json_from_file(project.npmpkg.package_json_path)
     # Coming from bundle
-    assert package_json['dependencies'] == {'lodash': '~4'}
+    assert package_json["dependencies"] == {"lodash": "~4"}
     # Coming from source package.json
-    assert package_json['devDependencies'] == {'lodash': '~4'}
-    assert package_json['peerDependencies'] == {}
+    assert package_json["devDependencies"] == {"lodash": "~4"}
+    assert package_json["peerDependencies"] == {}
 
     # Build project and see that it works.
     project.install()
@@ -211,23 +225,23 @@ def test_bundle_duplicated_entries(builddir, bundledir, bundledir2, destdir):
     """Test bundles with duplicated entries."""
     bundle1 = WebpackBundle(
         bundledir,
-        entry={'app': './index.js'},
+        entry={"app": "./index.js"},
         dependencies={
-            'lodash': '~4',
-        }
+            "lodash": "~4",
+        },
     )
     bundle2 = WebpackBundle(
         bundledir2,
-        entry={'app': './main.js'},
+        entry={"app": "./main.js"},
         dependencies={
-            'lodash': '~3',
-        }
+            "lodash": "~3",
+        },
     )
     project = WebpackBundleProject(
         working_dir=destdir,
         project_template_dir=builddir,
         bundles=(x for x in [bundle1, bundle2]),
-        config={'test': True, 'entry': False},
+        config={"test": True, "entry": False},
     )
 
     project.create()
