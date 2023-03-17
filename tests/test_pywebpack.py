@@ -24,7 +24,7 @@ from pywebpack import (
     WebpackProject,
     WebpackTemplateProject,
 )
-from pywebpack.helpers import merge_deps
+from pywebpack.helpers import max_version, merge_deps
 
 
 def json_from_file(filepath):
@@ -38,6 +38,32 @@ def test_version():
     from pywebpack import __version__
 
     assert __version__
+
+
+@pytest.mark.parametrize(
+    "v1,v2,expected",
+    [
+        ("1", "1", "1"),
+        ("1", "2", "2"),
+        ("2", "1", "2"),
+        ("1.0", "1.1", "1.1"),
+        ("2.3", "2.1", "2.3"),
+        ("2.3", "2", "2.3"),
+        ("1.0.0", "1.0.1", "1.0.1"),
+        ("1.0.0", "1.1.0", "1.1.0"),
+        ("1.0.0", "1.1", "1.1"),
+        ("1.0.0", "2.0.1", "2.0.1"),
+        ("1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.1"),
+        ("1.0.0-alpha.1", "1.0.0-alpha.beta", "1.0.0-alpha.beta"),
+        ("1.0.0-alpha.beta", "1.0.0-beta", "1.0.0-beta"),
+        ("1.0.0-beta", "1.0.0-beta.2", "1.0.0-beta.2"),
+        ("1.0.0-beta.2", "1.0.0-beta.11", "1.0.0-beta.11"),
+        ("1.0.0-beta.11", "1.0.0-rc.1", "1.0.0-rc.1"),
+        ("1.0.0-rc.1", "1.0.0", "1.0.0"),
+    ],
+)
+def test_max_version(v1, v2, expected):
+    assert max_version(v1, v2) == expected
 
 
 @pytest.mark.parametrize(
@@ -55,18 +81,45 @@ def test_version():
         ),
         (
             {"dependencies": {"mypkg": "1.0"}},
-            {"dependencies": {"mypkg": "2.0"}},
+            {"dependencies": {"mypkg": "1.1"}},
             {
-                "dependencies": {"mypkg": "2.0"},
+                "dependencies": {"mypkg": "1.1"},
                 "devDependencies": {},
                 "peerDependencies": {},
             },
         ),
         (
-            {"dependencies": {"mypkg": "2.0"}},
-            {"dependencies": {"mypkg": "1.0"}},
+            {"dependencies": {"mypkg": "0.0.1"}},
+            {"dependencies": {"mypkg": "0.1.0"}},
             {
-                "dependencies": {"mypkg": "2.0"},
+                "dependencies": {"mypkg": "0.1.0"},
+                "devDependencies": {},
+                "peerDependencies": {},
+            },
+        ),
+        (
+            {"dependencies": {"mypkg": "~2.0.1-alpha.1"}},
+            {"dependencies": {"mypkg": "2.0.1-beta"}},
+            {
+                "dependencies": {"mypkg": "2.0.1-beta"},
+                "devDependencies": {},
+                "peerDependencies": {},
+            },
+        ),
+        (
+            {"dependencies": {"mypkg": "^2.0.1"}},
+            {"dependencies": {"mypkg": "2.0.2"}},
+            {
+                "dependencies": {"mypkg": "2.0.2"},
+                "devDependencies": {},
+                "peerDependencies": {},
+            },
+        ),
+        (
+            {"dependencies": {"mypkg": "^3.3.1"}},
+            {"dependencies": {"mypkg": "~3.2.1"}},
+            {
+                "dependencies": {"mypkg": "^3.3.1"},
                 "devDependencies": {},
                 "peerDependencies": {},
             },
@@ -75,6 +128,14 @@ def test_version():
 )
 def test_merge_deps(target, source, expected):
     assert merge_deps(target, source) == expected
+
+
+def test_merge_deps_incompat_major():
+    with pytest.raises(RuntimeError):
+        merge_deps(
+            {"dependencies": {"mypkg": "3.3.1"}},
+            {"dependencies": {"mypkg": "4.2.1"}},
+        )
 
 
 def test_project(simpleprj):
