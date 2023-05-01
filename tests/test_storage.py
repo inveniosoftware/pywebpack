@@ -9,8 +9,6 @@
 
 """Storage class test."""
 
-from __future__ import absolute_import, print_function
-
 import time
 from os import remove, symlink, utime
 from os.path import exists, getmtime, islink, join, realpath

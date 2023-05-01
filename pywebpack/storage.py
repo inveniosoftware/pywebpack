@@ -9,8 +9,6 @@
 
 """Storage API."""
 
-from __future__ import absolute_import, print_function
-
 from os import listdir, makedirs, remove, symlink, walk
 from os.path import dirname, exists, getmtime, isfile, islink, join, realpath, relpath
 from shutil import copy

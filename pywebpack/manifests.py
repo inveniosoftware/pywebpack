@@ -10,8 +10,6 @@
 
 """Webpack manifests API."""
 
-from __future__ import absolute_import, print_function
-
 import json
 import sys
 from os.path import splitext
