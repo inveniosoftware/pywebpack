@@ -9,8 +9,6 @@
 
 """Webpack bundle API."""
 
-from __future__ import absolute_import, print_function
-
 
 class WebpackBundle(object):
     """Webpack bundle."""

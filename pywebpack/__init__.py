@@ -304,8 +304,6 @@ The manifest entries can be retrieved as object attributes or items::
 
 """
 
-from __future__ import absolute_import, print_function
-
 from .bundle import WebpackBundle
 from .helpers import bundles_from_entry_point
 from .manifests import (
