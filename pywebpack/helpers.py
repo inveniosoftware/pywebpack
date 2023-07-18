@@ -15,6 +15,8 @@ from functools import wraps
 
 import pkg_resources
 
+from pywebpack.errors import MergeConflictError
+
 # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 # Differences:
 # - `^\D*`: ignores the first not numberic char (major version), e.g. ~ or <
@@ -110,27 +112,36 @@ def max_version(v1, v2):
     return v1 if v1_maj > v2_maj else v2
 
 
-def merge_deps(deps, bundles_deps):
-    """Merge NPM dependencies."""
-    keys = ["dependencies", "devDependencies", "peerDependencies"]
-    for k in keys:
-        deps.setdefault(k, {})
-        if k in bundles_deps:
-            target_deps = deps[k]
-            source_deps = bundles_deps[k]
-            for pkg, version in source_deps.items():
-                if pkg in target_deps:
-                    target_version = target_deps[pkg]
+def merge_deps(computed_deps, incoming_deps):
+    """Merge NPM dependencies.
 
-                    v_maj, _, _, _ = _parse_version(version)
-                    tv_maj, _, _, _ = _parse_version(target_version)
+    :param computed_deps: dict with all computed deps,
+        after merging incoming deps into it.
+    :param incoming_deps: new incoming deps to be merged
+        into `computed_deps`.
+    :return: the computed_deps dict with merged `incoming_deps` into it.
+    :raise: raises the MergeConflictError exception when deps
+        cannot be merged.
+    """
+    dep_types = ["dependencies", "devDependencies", "peerDependencies"]
+    for dep_type in dep_types:
+        computed_deps.setdefault(dep_type, {})
+        if dep_type in incoming_deps:
+            computed = computed_deps[dep_type]
+            incoming = incoming_deps[dep_type]
+            for incoming_pkg, incoming_version in incoming.items():
+                if incoming_pkg in computed:
+                    computed_version = computed[incoming_pkg]
+
+                    v_maj, _, _, _ = _parse_version(incoming_version)
+                    tv_maj, _, _, _ = _parse_version(computed_version)
                     if v_maj != tv_maj:
-                        raise RuntimeError(
-                            f"{pkg}: incompatible major versions {version} and {target_version}."
+                        raise MergeConflictError(
+                            f"Incompatible major versions for package {incoming_pkg}: current version is {computed_version}, incoming version is {incoming_version}"
                         )
 
-                    _max = max_version(version, target_version)
-                    target_deps[pkg] = _max
+                    _max = max_version(incoming_version, computed_version)
+                    computed[incoming_pkg] = _max
                 else:
-                    target_deps[pkg] = version
-    return deps
+                    computed[incoming_pkg] = incoming_version
+    return computed_deps

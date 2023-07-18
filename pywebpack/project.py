@@ -17,6 +17,8 @@ from os.path import dirname, exists, join
 
 from pynpm import NPMPackage, YarnPackage
 
+from pywebpack.errors import MergeConflictError
+
 from .helpers import cached, check_exit, merge_deps
 from .storage import FileStorage
 
@@ -273,7 +275,12 @@ class WebpackBundleProject(WebpackTemplateProject):
         """Get package.json dependencies."""
         res = {"dependencies": {}, "devDependencies": {}, "peerDependencies": {}}
         for b in self.bundles:
-            merge_deps(res, b.dependencies)
+            try:
+                merge_deps(res, b.dependencies)
+            except MergeConflictError as e:
+                conflicting = b.path
+                new_msg = f"{e.args[0]}. Conflicting dependency found in {conflicting}"
+                raise MergeConflictError(new_msg)
         return res
 
     @property

@@ -22,6 +22,7 @@ from pywebpack import (
     WebpackProject,
     WebpackTemplateProject,
 )
+from pywebpack.errors import MergeConflictError
 from pywebpack.helpers import max_version, merge_deps
 
 
@@ -129,7 +130,7 @@ def test_merge_deps(target, source, expected):
 
 
 def test_merge_deps_incompat_major():
-    with pytest.raises(RuntimeError):
+    with pytest.raises(MergeConflictError):
         merge_deps(
             {"dependencies": {"mypkg": "3.3.1"}},
             {"dependencies": {"mypkg": "4.2.1"}},
