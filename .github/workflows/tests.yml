@@ -30,7 +30,6 @@ jobs:
     strategy:
       matrix:
           python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
-          requirements-level: [pypi]
     env:
       EXTRAS: tests
     steps:
@@ -42,20 +41,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Generate dependencies
-        run: |
-          pip install wheel requirements-builder
-          requirements-builder -e "$EXTRAS" --level=${{ matrix.requirements-level }} setup.py > .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
-
       - name: Cache pip
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('.${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}-${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
-          pip install -r .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
           pip install .[$EXTRAS]
           pip freeze
 
