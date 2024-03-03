@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 2.0.0 (released 2024-03-04)
+
+- Removes dependency on node-semver package
+- Changes the NPM dependencies merging algorithm to fail when conflicting
+  major versions of the same package are found.
+
 Version 1.2.0 (released 2021-01-21)
 
 - Fixes an issue where if you were using WebpackBundleProject with
