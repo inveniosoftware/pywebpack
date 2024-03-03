@@ -322,7 +322,7 @@ from .manifests import (
 from .project import WebpackBundleProject, WebpackProject, WebpackTemplateProject
 from .storage import FileStorage, LinkStorage
 
-__version__ = "1.2.0"
+__version__ = "2.0.0"
 
 __all__ = (
     "__version__",
