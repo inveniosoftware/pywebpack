@@ -13,7 +13,7 @@
 import re
 from functools import wraps
 
-import pkg_resources
+from importlib_metadata import entry_points
 
 from pywebpack.errors import MergeConflictError
 
@@ -31,7 +31,7 @@ def _load_ep(ep):
 
 def bundles_from_entry_point(group):
     """Load bundles from entry point group."""
-    return (_load_ep(ep) for ep in pkg_resources.iter_entry_points(group))
+    return (_load_ep(ep) for ep in entry_points(group=group))
 
 
 def cached(f):

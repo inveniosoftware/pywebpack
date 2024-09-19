@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.0.1 (unreleased)
+
+- Removes implicit dependency on setuptools and use importlib-metadata instead of the
+  deprecated pkg_resources module
+
 Version 2.0.0 (released 2024-03-04)
 
 - Removes dependency on node-semver package
