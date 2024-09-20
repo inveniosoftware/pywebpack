@@ -1,7 +1,7 @@
 Changes
 =======
 
-Version 2.0.1 (unreleased)
+Version 2.0.1 (released 2024-09-20)
 
 - Removes implicit dependency on setuptools and use importlib-metadata instead of the
   deprecated pkg_resources module
