@@ -239,10 +239,27 @@ class WebpackBundleProject(WebpackTemplateProject):
         return entries["entries"]
 
     @property
+    def copy(self):
+        """Get instructions for copying assets around."""
+        copy_instructions = []
+        for bundle in self.bundles:
+            for copy in bundle.copy:
+                if set(copy.keys()) != {"from", "to"}:
+                    raise RuntimeError(
+                        f"Invalid copy instruction: {copy}. "
+                        "Requires exactly 'to' and 'from' keys to be present."
+                    )
+
+                # NOTE: the validation check is performed in the JS build step
+                copy_instructions.append(copy)
+
+        return copy_instructions
+
+    @property
     def config(self):
         """Inject webpack entry points from bundles."""
         config = super(WebpackBundleProject, self).config
-        config.update({"entry": self.entry, "aliases": self.aliases})
+        config.update({"entry": self.entry, "aliases": self.aliases, "copy": self.copy})
         return config
 
     @property
