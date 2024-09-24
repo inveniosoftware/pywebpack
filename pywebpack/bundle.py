@@ -21,6 +21,7 @@ class WebpackBundle(object):
         devDependencies=None,
         peerDependencies=None,
         aliases=None,
+        copy=None,
     ):
         """Initialize webpack bundle.
 
@@ -32,6 +33,7 @@ class WebpackBundle(object):
         :param devDependencies: npm dev dependencies.
         :param peerDependencies: npm peer dependencies.
         :param aliases: Webpack resolver aliases.
+        :param copy: Instructions to copy assets somewhere else.
         """
         self.path = path
         self.entry = entry or {}
@@ -41,3 +43,4 @@ class WebpackBundle(object):
             "peerDependencies": peerDependencies or {},
         }
         self.aliases = aliases or {}
+        self.copy = copy or []

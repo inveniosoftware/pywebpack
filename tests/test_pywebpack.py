@@ -226,6 +226,7 @@ def test_bundleproject(builddir, bundledir, destdir):
     """Test bundle project."""
     entry = {"app": "./index.js"}
     aliases = {"@app": "index.js"}
+    copy = [{"from": "./source/", "to": "./target/"}]
     bundle = WebpackBundle(
         bundledir,
         entry=entry,
@@ -233,6 +234,7 @@ def test_bundleproject(builddir, bundledir, destdir):
             "lodash": "~4",
         },
         aliases=aliases,
+        copy=copy,
     )
     project = WebpackBundleProject(
         working_dir=destdir,
@@ -243,7 +245,12 @@ def test_bundleproject(builddir, bundledir, destdir):
 
     assert project.bundles == [bundle]
     assert project.entry == entry
-    assert project.config == {"entry": entry, "test": True, "aliases": aliases}
+    assert project.config == {
+        "entry": entry,
+        "test": True,
+        "aliases": aliases,
+        "copy": copy,
+    }
     assert project.dependencies == {
         "dependencies": {
             "lodash": "~4",
