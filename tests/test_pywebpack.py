@@ -13,6 +13,7 @@
 import json
 import os
 from os.path import exists, join
+from pathlib import Path
 
 import pytest
 
@@ -241,6 +242,7 @@ def test_bundleproject(builddir, bundledir, destdir):
         project_template_dir=builddir,
         bundles=(x for x in [bundle]),  # Test for iterator evaluation
         config={"test": True, "entry": False},
+        allowed_copy_paths=None,  # Skips copy path validation
     )
 
     assert project.bundles == [bundle]
@@ -287,28 +289,95 @@ def test_bundleproject(builddir, bundledir, destdir):
         assert exists(join(project.project_path, p))
 
 
-@pytest.mark.xfail(raises=RuntimeError)
 def test_bundle_duplicated_entries(builddir, bundledir, bundledir2, destdir):
     """Test bundles with duplicated entries."""
-    bundle1 = WebpackBundle(
+    with pytest.raises(RuntimeError):
+        bundle1 = WebpackBundle(
+            bundledir,
+            entry={"app": "./index.js"},
+            dependencies={
+                "lodash": "~4",
+            },
+        )
+        bundle2 = WebpackBundle(
+            bundledir2,
+            entry={"app": "./main.js"},
+            dependencies={
+                "lodash": "~3",
+            },
+        )
+        project = WebpackBundleProject(
+            working_dir=destdir,
+            project_template_dir=builddir,
+            bundles=(x for x in [bundle1, bundle2]),
+            config={"test": True, "entry": False},
+        )
+
+        project.create()
+
+
+def test_bundle_copy_path_validation(builddir, bundledir, destdir):
+    """Test bundles with invalid copy instructions."""
+    # Allow the precise locations
+    bundle = WebpackBundle(
         bundledir,
-        entry={"app": "./index.js"},
-        dependencies={
-            "lodash": "~4",
-        },
-    )
-    bundle2 = WebpackBundle(
-        bundledir2,
-        entry={"app": "./main.js"},
-        dependencies={
-            "lodash": "~3",
-        },
+        copy=[{"from": "/etc/hosts", "to": "/mnt"}],
     )
     project = WebpackBundleProject(
         working_dir=destdir,
         project_template_dir=builddir,
-        bundles=(x for x in [bundle1, bundle2]),
-        config={"test": True, "entry": False},
+        bundles=[bundle],
+        allowed_copy_paths=["/etc", "/mnt"],
     )
-
     project.create()
+
+    # Test allowance of paths relative to the config,
+    # and dedicated allow-listed paths
+    config_path = Path(destdir).joinpath("config.json")
+    bundle = WebpackBundle(
+        bundledir,
+        copy=[{"from": "/home/invenio/", "to": "./path/from/config/"}],
+    )
+    project = WebpackBundleProject(
+        working_dir=destdir,
+        project_template_dir=builddir,
+        bundles=[bundle],
+        config_path=str(config_path),
+        allowed_copy_paths=["/home/invenio", destdir],
+    )
+    project.create()
+
+    # As soon as either one of the paths isn't allowed anymore, it should fail
+    with pytest.raises(RuntimeError):
+        project = WebpackBundleProject(
+            working_dir=destdir,
+            project_template_dir=builddir,
+            bundles=[bundle],
+            config_path=str(config_path),
+            allowed_copy_paths=["/home/invenio"],
+        )
+        project.create()
+
+    with pytest.raises(RuntimeError):
+        project = WebpackBundleProject(
+            working_dir=destdir,
+            project_template_dir=builddir,
+            bundles=[bundle],
+            config_path=str(config_path),
+            allowed_copy_paths=[destdir],
+        )
+        project.create()
+
+    # Also, don't allow access to locations like "/etc"
+    with pytest.raises(RuntimeError):
+        bundle = WebpackBundle(
+            bundledir,
+            copy=[{"from": "./local/", "to": "/etc"}],
+        )
+        project = WebpackBundleProject(
+            working_dir=destdir,
+            project_template_dir=builddir,
+            bundles=[bundle],
+            allowed_copy_paths=[builddir],
+        )
+        project.create()

@@ -33,7 +33,9 @@ class WebpackBundle(object):
         :param devDependencies: npm dev dependencies.
         :param peerDependencies: npm peer dependencies.
         :param aliases: Webpack resolver aliases.
-        :param copy: Instructions to copy assets somewhere else.
+        :param copy: List of copy instructions of the shape
+            ``{"from": "source_path", "to": "dest_path"}`` for copying assets.
+            Paths are relative to the directory of the resulting config.
         """
         self.path = path
         self.entry = entry or {}
