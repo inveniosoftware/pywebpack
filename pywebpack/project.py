@@ -201,7 +201,6 @@ class WebpackBundleProject(WebpackTemplateProject):
         return join(self._project_template_dir, self._package_json_source_path)
 
     @property
-    @cached
     def allowed_copy_paths(self):
         """Allowed copy paths as ``pathlib.Path`` objects."""
         _paths = self._allowed_copy_paths
@@ -271,6 +270,7 @@ class WebpackBundleProject(WebpackTemplateProject):
     def copy(self):
         """Get (validated) instructions for copying assets around."""
         config_path = self._get_dir_path(self.config_path)
+        allowed_paths = self.allowed_copy_paths
 
         copy_instructions = []
         for bundle in self.bundles:
@@ -286,19 +286,19 @@ class WebpackBundleProject(WebpackTemplateProject):
                 to_path = self._get_dir_path(config_path.joinpath(copy["to"]))
 
                 # If the set of allowed paths is not empty, perform sanity checks
-                if self.allowed_copy_paths:
+                if allowed_paths:
                     from_path_ok = any(
-                        [from_path.is_relative_to(ap) for ap in self.allowed_copy_paths]
+                        [from_path.is_relative_to(ap) for ap in allowed_paths]
                     )
                     to_path_ok = any(
-                        [to_path.is_relative_to(ap) for ap in self.allowed_copy_paths]
+                        [to_path.is_relative_to(ap) for ap in allowed_paths]
                     )
 
                     if not from_path_ok or not to_path_ok:
                         raise RuntimeError(
                             f"Copy instruction '{copy}' is out of bounds "
                             f"({{'from': '{from_path}', 'to': '{to_path}'}}). "
-                            f"Allowed paths: {self.allowed_copy_paths}"
+                            f"Allowed paths: {allowed_paths}"
                         )
 
                 copy_instructions.append(copy)
