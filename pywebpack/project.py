@@ -204,16 +204,17 @@ class WebpackBundleProject(WebpackTemplateProject):
     @cached
     def allowed_copy_paths(self):
         """Allowed copy paths as ``pathlib.Path`` objects."""
+        _paths = self._allowed_copy_paths
         config_path = pathlib.Path(self.config_path)
-        paths = []
-        for p in self._allowed_copy_paths:
+        allowed_copy_paths = []
+        for p in _paths() if callable(_paths) else _paths:
             allowed_path = pathlib.Path(p)
             if not allowed_path.is_absolute():
                 allowed_path = config_path.joinpath(allowed_path)
 
-            paths.append(allowed_path)
+            allowed_copy_paths.append(allowed_path)
 
-        return paths
+        return allowed_copy_paths
 
     @property
     @cached
