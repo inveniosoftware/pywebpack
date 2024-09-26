@@ -11,6 +11,7 @@
 """API for creating and building Webpack projects."""
 
 import json
+import pathlib
 import shutil
 from os import makedirs
 from os.path import dirname, exists, join
@@ -160,6 +161,7 @@ class WebpackBundleProject(WebpackTemplateProject):
         config_path=None,
         storage_cls=None,
         package_json_source_path="package.json",
+        allowed_copy_paths=None,
     ):
         """Initialize templated folder.
 
@@ -179,9 +181,12 @@ class WebpackBundleProject(WebpackTemplateProject):
         :param storage_cls: Storage class.
         :param package_json_source_path: Path relative to
             `project_template_dir` to the project's package.json.
+        :param allowed_copy_paths: List of paths (absolute, or relative to
+            the `config_path`) that are allowed for bundle copy instructions.
         """
         self._bundles_iter = bundles or []
         self._package_json_source_path = package_json_source_path
+        self._allowed_copy_paths = allowed_copy_paths or []
         super(WebpackBundleProject, self).__init__(
             working_dir,
             project_template_dir=project_template_dir,
@@ -194,6 +199,21 @@ class WebpackBundleProject(WebpackTemplateProject):
     def package_json_source_path(self):
         """Full path to the source package.json."""
         return join(self._project_template_dir, self._package_json_source_path)
+
+    @property
+    @cached
+    def allowed_copy_paths(self):
+        """Allowed copy paths as ``pathlib.Path`` objects."""
+        config_path = pathlib.Path(self.config_path)
+        paths = []
+        for p in self._allowed_copy_paths:
+            allowed_path = pathlib.Path(p)
+            if not allowed_path.is_absolute():
+                allowed_path = config_path.joinpath(allowed_path)
+
+            paths.append(allowed_path)
+
+        return paths
 
     @property
     @cached
@@ -238,9 +258,19 @@ class WebpackBundleProject(WebpackTemplateProject):
             entries["entries"].update(bundle.entry)
         return entries["entries"]
 
+    def _get_dir_path(self, path):
+        """Get the directory part of the specified path."""
+        p = pathlib.Path(path)
+
+        # `p.parent` is the directory for files, but the parent dir for directories
+        # (if it doesn't exist, we assume it to be a directory)
+        return p.parent if p.is_file() else p
+
     @property
     def copy(self):
-        """Get instructions for copying assets around."""
+        """Get (validated) instructions for copying assets around."""
+        config_path = self._get_dir_path(self.config_path)
+
         copy_instructions = []
         for bundle in self.bundles:
             for copy in bundle.copy:
@@ -250,7 +280,26 @@ class WebpackBundleProject(WebpackTemplateProject):
                         "Requires exactly 'to' and 'from' keys to be present."
                     )
 
-                # NOTE: the validation check is performed in the JS build step
+                # If the copy paths are not absolute, they are relative to the config
+                from_path = self._get_dir_path(config_path.joinpath(copy["from"]))
+                to_path = self._get_dir_path(config_path.joinpath(copy["to"]))
+
+                # If the set of allowed paths is not empty, perform sanity checks
+                if self.allowed_copy_paths:
+                    from_path_ok = any(
+                        [from_path.is_relative_to(ap) for ap in self.allowed_copy_paths]
+                    )
+                    to_path_ok = any(
+                        [to_path.is_relative_to(ap) for ap in self.allowed_copy_paths]
+                    )
+
+                    if not from_path_ok or not to_path_ok:
+                        raise RuntimeError(
+                            f"Copy instruction '{copy}' is out of bounds "
+                            f"({{'from': '{from_path}', 'to': '{to_path}'}}). "
+                            f"Allowed paths: {self.allowed_copy_paths}"
+                        )
+
                 copy_instructions.append(copy)
 
         return copy_instructions
