@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.1.0 (released 2024-11-26)
+
+- Add a copy func to copy assets from a directly to another. It validates the from/to
+  path to sandbox the copy locations.
+
 Version 2.0.1 (released 2024-09-20)
 
 - Removes implicit dependency on setuptools and use importlib-metadata instead of the
