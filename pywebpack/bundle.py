@@ -2,6 +2,7 @@
 #
 # This file is part of PyWebpack
 # Copyright (C) 2017 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # PyWebpack is free software; you can redistribute it and/or modify
 # it under the terms of the Revised BSD License; see LICENSE file for
@@ -22,6 +23,7 @@ class WebpackBundle(object):
         peerDependencies=None,
         aliases=None,
         copy=None,
+        scripts=None,
     ):
         """Initialize webpack bundle.
 
@@ -37,6 +39,7 @@ class WebpackBundle(object):
             ``{"from": "source_path", "to": "dest_path"}`` for copying assets.
             Paths are relative to the directory of the resulting config.
         """
+        self.scripts = scripts
         self.path = path
         self.entry = entry or {}
         self.dependencies = {

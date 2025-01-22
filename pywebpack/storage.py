@@ -2,6 +2,7 @@
 #
 # This file is part of PyWebpack
 # Copyright (C) 2017 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # PyWebpack is free software; you can redistribute it and/or modify
 # it under the terms of the Revised BSD License; see LICENSE file for
@@ -16,6 +17,9 @@ from shutil import copy
 
 def iter_files(folder):
     """Iterate all files in a given root directory."""
+    if folder is None:
+        return
+
     for root, dirnames, filenames in walk(folder):
         for f in filenames:
             f = join(root, f)
@@ -26,6 +30,9 @@ def iter_paths(folder, root=None, depth=None):
     """Recursively yields paths under a folder up to a maximum depth."""
     assert depth is None or depth >= 0
     root = root or folder  # needed to compute the relative name
+
+    if folder is None:
+        return
 
     if depth is None:  # yield all paths
         for result in iter_files(folder):

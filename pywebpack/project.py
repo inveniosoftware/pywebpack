@@ -3,6 +3,7 @@
 # This file is part of PyWebpack
 # Copyright (C) 2017-2020 CERN.
 # Copyright (C) 2020 Cottage Labs LLP.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # PyWebpack is free software; you can redistribute it and/or modify
 # it under the terms of the Revised BSD License; see LICENSE file for
@@ -352,12 +353,24 @@ class WebpackBundleProject(WebpackTemplateProject):
 
     @property
     @cached
+    def scripts(self):
+        """Get scripts."""
+        res = {}
+        for b in self.bundles:
+            if b.scripts:
+                res.update(b.scripts)
+        return res
+
+    @property
+    @cached
     def package_json(self):
-        """Merge bundle dependencies into ``package.json``."""
+        """Merge bundle configuration into ``package.json``."""
         # Reads package.json from the project_template_dir and merges in
         # bundle dependencies. Note, that package.json is not symlinked
         # because then we risk changing the source package.json automatically.
-        return merge_deps(self.package_json_source, self.dependencies)
+        package_json = merge_deps(self.package_json_source, self.dependencies)
+        package_json["scripts"].update(self.scripts)
+        return package_json
 
     def collect(self, force=None):
         """Collect asset files from bundles."""
