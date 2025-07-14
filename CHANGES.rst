@@ -1,6 +1,10 @@
 Changes
 =======
 
+Version v2.2.0 (released 2025-07-14)
+
+- chores: replaced importlib_metadata with importlib
+
 Version 2.1.0 (released 2024-11-26)
 
 - Add a copy func to copy assets from a directly to another. It validates the from/to
