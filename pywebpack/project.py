@@ -282,8 +282,11 @@ class WebpackBundleProject(WebpackTemplateProject):
                     )
 
                 # If the copy paths are not absolute, they are relative to the config
-                from_path = self._get_dir_path(config_path.joinpath(copy["from"]))
-                to_path = self._get_dir_path(config_path.joinpath(copy["to"]))
+                # str(...) because `from` and `to` can hold a LocalProxy
+                from_str = str(copy["from"])
+                from_path = self._get_dir_path(config_path.joinpath(from_str))
+                to_str = str(copy["to"])
+                to_path = self._get_dir_path(config_path.joinpath(to_str))
 
                 # If the set of allowed paths is not empty, perform sanity checks
                 if allowed_paths:
@@ -301,7 +304,7 @@ class WebpackBundleProject(WebpackTemplateProject):
                             f"Allowed paths: {allowed_paths}"
                         )
 
-                copy_instructions.append(copy)
+                copy_instructions.append({"from": from_str, "to": to_str})
 
         return copy_instructions
 
