@@ -1,6 +1,10 @@
 Changes
 =======
 
+Version 2.2.1 (released 2025-12-03)
+
+- project: allow for `LocalProxy` in `copy` `to` and `from` fields
+
 Version v2.2.0 (released 2025-07-14)
 
 - chores: replaced importlib_metadata with importlib
