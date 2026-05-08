@@ -344,9 +344,15 @@ class WebpackBundleProject(WebpackTemplateProject):
     def dependencies(self):
         """Get package.json dependencies."""
         res = {"dependencies": {}, "devDependencies": {}, "peerDependencies": {}}
+        origins = {}
         for b in self.bundles:
             try:
-                merge_deps(res, b.dependencies)
+                merge_deps(
+                    res,
+                    b.dependencies,
+                    incoming_label=b.path,
+                    origins=origins,
+                )
             except MergeConflictError as e:
                 conflicting = b.path
                 new_msg = f"{e.args[0]}. Conflicting dependency found in {conflicting}"
@@ -360,7 +366,11 @@ class WebpackBundleProject(WebpackTemplateProject):
         # Reads package.json from the project_template_dir and merges in
         # bundle dependencies. Note, that package.json is not symlinked
         # because then we risk changing the source package.json automatically.
-        return merge_deps(self.package_json_source, self.dependencies)
+        return merge_deps(
+            self.package_json_source,
+            self.dependencies,
+            incoming_label="computed bundle dependencies",
+        )
 
     def collect(self, force=None):
         """Collect asset files from bundles."""
