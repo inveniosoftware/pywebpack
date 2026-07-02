@@ -1,6 +1,13 @@
 Changes
 =======
 
+Version 2.3.0 (released 2026-07-02)
+
+- chore(setup): migrate from setuptools to hatchling
+- feat: add path of incompatible versions
+- chore(setup): bump pytest-invenio version
+- chore(licenses): update license headers to use SPDX
+
 Version 2.2.1 (released 2025-12-03)
 
 - project: allow for `LocalProxy` in `copy` `to` and `from` fields

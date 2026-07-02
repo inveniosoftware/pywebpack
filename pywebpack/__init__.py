@@ -316,7 +316,7 @@ from .manifests import (
 from .project import WebpackBundleProject, WebpackProject, WebpackTemplateProject
 from .storage import FileStorage, LinkStorage
 
-__version__ = "2.2.1"
+__version__ = "2.3.0"
 
 __all__ = (
     "__version__",
