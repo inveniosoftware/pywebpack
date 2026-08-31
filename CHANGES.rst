@@ -1,6 +1,10 @@
 Changes
 =======
 
+Version v2.4.0 (released 2026-08-31)
+
+- feat: allow local paths
+
 Version 2.3.0 (released 2026-07-02)
 
 - chore(setup): migrate from setuptools to hatchling
