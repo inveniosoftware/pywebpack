@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2017-2020 CERN.
 # SPDX-FileCopyrightText: 2020 Cottage Labs LLP.
+# SPDX-FileCopyrightText: 2026 Graz University of Technology.
 # SPDX-License-Identifier: BSD-3-Clause
 
 """API for creating and building Webpack projects."""
@@ -57,7 +58,7 @@ class WebpackProject(object):
     @check_exit
     def build(self, *args):
         """Run build script."""
-        return self.run("build", *args)
+        return self.npmpkg.build(*args)
 
     def buildall(self):
         """Build project from scratch."""
